@@ -44,6 +44,64 @@ async function isDuplicate(link) {
   return !snapshot.empty;
 }
 
+// ========== 블로그 필터링 (우선순위별) ==========
+function filterBlog(title, description) {
+  const text = (title + ' ' + description).toLowerCase();
+  
+  // 1순위: '공모전' AND '후기'
+  if (text.includes('공모전') && text.includes('후기')) {
+    return { pass: true, priority: 1, reason: '공모전+후기' };
+  }
+  
+  // 2순위: '공모전'만
+  if (text.includes('공모전')) {
+    return { pass: true, priority: 2, reason: '공모전' };
+  }
+  
+  // 3순위: '팀' AND '참여' AND '후기'
+  if (text.includes('팀') && text.includes('참여') && text.includes('후기')) {
+    return { pass: true, priority: 3, reason: '팀+참여+후기' };
+  }
+  
+  return { pass: false, priority: 0, reason: '필터 불통과' };
+}
+
+// ========== 뉴스 필터링 ==========
+function filterNews(title, description) {
+  const text = title + ' ' + description;
+  
+  // 키워드 체크
+  const hasKeyword = ['추진', '결정', '논의'].some(k => text.includes(k));
+  if (!hasKeyword) {
+    return { pass: false, reason: '키워드 없음' };
+  }
+  
+  // 고유명사(2-4글자 한글) 빈도 체크
+  const words = text.match(/[가-힣]{2,4}/g) || [];
+  const wordCount = {};
+  
+  words.forEach(word => {
+    // 일반 단어 제외
+    const commonWords = ['하는', '있는', '없는', '되는', '이를', '그는', '같은', '위한', '대한', '등의'];
+    if (commonWords.includes(word)) return;
+    
+    wordCount[word] = (wordCount[word] || 0) + 1;
+  });
+  
+  // 3번 이상 반복되는 단어가 있는지
+  const repeated = Object.entries(wordCount).filter(([word, count]) => count >= 3);
+  
+  if (repeated.length > 0) {
+    return { 
+      pass: true, 
+      entities: repeated.map(([word, count]) => `${word}(${count}회)`).join(', '),
+      reason: '인물/기관명 반복 + 키워드'
+    };
+  }
+  
+  return { pass: false, reason: '반복 단어 부족' };
+}
+
 // Claude로 케이스 분석
 async function analyzeWithClaude(title, description) {
   const prompt = `다음은 팀 프로젝트나 협업에 관한 블로그/뉴스 내용입니다.
@@ -148,15 +206,11 @@ async function analyzeWithClaude(title, description) {
 // 네이버 블로그 검색
 async function searchNaverBlog(keyword) {
   try {
-    const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
-    const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
-    
     const response = await axios.get('https://openapi.naver.com/v1/search/blog.json', {
       params: { 
         query: keyword, 
         display: 100,
-        start: randomStart,
-        sort: randomSort
+        sort: 'sim'
       },
       headers: { 
         'X-Naver-Client-Id': NAVER_CLIENT_ID,
@@ -173,15 +227,11 @@ async function searchNaverBlog(keyword) {
 // 네이버 뉴스 검색
 async function searchNaverNews(keyword) {
   try {
-    const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
-    const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
-    
     const response = await axios.get('https://openapi.naver.com/v1/search/news.json', {
       params: { 
         query: keyword, 
         display: 100,
-        start: randomStart,
-        sort: randomSort
+        sort: 'sim'
       },
       headers: { 
         'X-Naver-Client-Id': NAVER_CLIENT_ID,
@@ -199,200 +249,228 @@ async function collectContent() {
   console.log('🚀 수집 시작...');
   const results = [];
   let targetCounts = {
-    primaryBlog: 10,
-    secondaryBlog: 5,
-    primaryNews: 3,
-    secondaryNews: 2
+    priority1: 5,  // 공모전+후기
+    priority2: 5,  // 공모전만
+    priority3: 5,  // 팀+참여+후기
+    news: 5        // 뉴스
   };
   let actualCounts = {
-    primaryBlog: 0,
-    secondaryBlog: 0,
-    primaryNews: 0,
-    secondaryNews: 0
+    priority1: 0,
+    priority2: 0,
+    priority3: 0,
+    news: 0
   };
   
-  // 1차 키워드 블로그
-  console.log('📌 1차 키워드 블로그 수집 (목표: 10개)');
+  // ========== 블로그 수집 (우선순위별) ==========
+  console.log('📌 블로그 수집 시작...');
+  
+  const blogItems = [];
   for (const keyword of PRIMARY_KEYWORDS) {
-    if (actualCounts.primaryBlog >= targetCounts.primaryBlog) break;
-    
-    console.log(`🔍 [1차 블로그] ${keyword}`);
+    console.log(`🔍 [블로그] ${keyword} 검색 중...`);
     const items = await searchNaverBlog(keyword);
-    
-    for (const item of items) {
-      if (actualCounts.primaryBlog >= targetCounts.primaryBlog) break;
-      if (await isDuplicate(item.link)) continue;
-      
-      const title = stripHtml(item.title);
-      const description = stripHtml(item.description);
-      
-      // Claude로 분석
-      console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithClaude(title, description);
-      
-      if (!analysis) {
-        console.log(`  ⏭️  관련 없음 - 스킵`);
-        continue;
-      }
-      
-      results.push({
-        source: 'blog',
-        priority: 'primary',
-        keyword,
-        title,
-        content: description,
-        link: item.link,
-        postDate: item.postdate,
-        analysis,
-        timestamp: new Date().toISOString()
-      });
-      
-      actualCounts.primaryBlog++;
-      console.log(`  ✅ 추가 (${actualCounts.primaryBlog}/${targetCounts.primaryBlog})`);
-      
-      // API 속도 제한 고려
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    
+    blogItems.push(...items);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // 2차 키워드 블로그
-  console.log('\n📌 2차 키워드 블로그 수집 (목표: 5개)');
-  for (const keyword of SECONDARY_KEYWORDS) {
-    if (actualCounts.secondaryBlog >= targetCounts.secondaryBlog) break;
+  console.log(`📊 총 ${blogItems.length}개 블로그 검색 완료`);
+  console.log('🔍 필터링 중...');
+  
+  // 우선순위별로 분류
+  const priority1 = [];
+  const priority2 = [];
+  const priority3 = [];
+  
+  for (const item of blogItems) {
+    if (await isDuplicate(item.link)) continue;
     
-    console.log(`🔍 [2차 블로그] ${keyword}`);
-    const items = await searchNaverBlog(keyword);
+    const title = stripHtml(item.title);
+    const description = stripHtml(item.description);
+    const filter = filterBlog(title, description);
     
-    for (const item of items) {
-      if (actualCounts.secondaryBlog >= targetCounts.secondaryBlog) break;
-      if (await isDuplicate(item.link)) continue;
-      
-      const title = stripHtml(item.title);
-      const description = stripHtml(item.description);
-      
-      console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithClaude(title, description);
-      
-      if (!analysis) {
-        console.log(`  ⏭️  관련 없음 - 스킵`);
-        continue;
-      }
-      
-      results.push({
-        source: 'blog',
-        priority: 'secondary',
-        keyword,
+    if (filter.pass) {
+      const data = {
+        item,
         title,
-        content: description,
-        link: item.link,
-        postDate: item.postdate,
-        analysis,
-        timestamp: new Date().toISOString()
-      });
+        description,
+        filterReason: filter.reason
+      };
       
-      actualCounts.secondaryBlog++;
-      console.log(`  ✅ 추가 (${actualCounts.secondaryBlog}/${targetCounts.secondaryBlog})`);
-      
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (filter.priority === 1) priority1.push(data);
+      else if (filter.priority === 2) priority2.push(data);
+      else if (filter.priority === 3) priority3.push(data);
     }
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // 1차 키워드 뉴스
-  console.log('\n📌 1차 키워드 뉴스 수집 (목표: 3개)');
+  console.log(`✅ 1순위(공모전+후기): ${priority1.length}개`);
+  console.log(`✅ 2순위(공모전): ${priority2.length}개`);
+  console.log(`✅ 3순위(팀+참여+후기): ${priority3.length}개`);
+  
+  // 1순위 처리
+  console.log('\n📌 1순위 블로그 분석 중...');
+  for (const data of priority1) {
+    if (actualCounts.priority1 >= targetCounts.priority1) break;
+    
+    console.log(`  🤖 [1순위] ${data.title.substring(0, 30)}...`);
+    const analysis = await analyzeWithClaude(data.title, data.description);
+    
+    if (!analysis) {
+      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
+      continue;
+    }
+    
+    results.push({
+      source: 'blog',
+      priority: 'priority1',
+      keyword: data.filterReason,
+      title: data.title,
+      content: data.description,
+      link: data.item.link,
+      postDate: data.item.postdate,
+      analysis,
+      timestamp: new Date().toISOString()
+    });
+    
+    actualCounts.priority1++;
+    console.log(`  ✅ 추가 (${actualCounts.priority1}/${targetCounts.priority1})`);
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+  
+  // 2순위 처리
+  console.log('\n📌 2순위 블로그 분석 중...');
+  for (const data of priority2) {
+    if (actualCounts.priority2 >= targetCounts.priority2) break;
+    
+    console.log(`  🤖 [2순위] ${data.title.substring(0, 30)}...`);
+    const analysis = await analyzeWithClaude(data.title, data.description);
+    
+    if (!analysis) {
+      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
+      continue;
+    }
+    
+    results.push({
+      source: 'blog',
+      priority: 'priority2',
+      keyword: data.filterReason,
+      title: data.title,
+      content: data.description,
+      link: data.item.link,
+      postDate: data.item.postdate,
+      analysis,
+      timestamp: new Date().toISOString()
+    });
+    
+    actualCounts.priority2++;
+    console.log(`  ✅ 추가 (${actualCounts.priority2}/${targetCounts.priority2})`);
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+  
+  // 3순위 처리
+  console.log('\n📌 3순위 블로그 분석 중...');
+  for (const data of priority3) {
+    if (actualCounts.priority3 >= targetCounts.priority3) break;
+    
+    console.log(`  🤖 [3순위] ${data.title.substring(0, 30)}...`);
+    const analysis = await analyzeWithClaude(data.title, data.description);
+    
+    if (!analysis) {
+      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
+      continue;
+    }
+    
+    results.push({
+      source: 'blog',
+      priority: 'priority3',
+      keyword: data.filterReason,
+      title: data.title,
+      content: data.description,
+      link: data.item.link,
+      postDate: data.item.postdate,
+      analysis,
+      timestamp: new Date().toISOString()
+    });
+    
+    actualCounts.priority3++;
+    console.log(`  ✅ 추가 (${actualCounts.priority3}/${targetCounts.priority3})`);
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+  
+  // ========== 뉴스 수집 ==========
+  console.log('\n📌 뉴스 수집 시작...');
+  
+  const newsItems = [];
   for (const keyword of PRIMARY_KEYWORDS) {
-    if (actualCounts.primaryNews >= targetCounts.primaryNews) break;
-    
-    console.log(`📰 [1차 뉴스] ${keyword}`);
+    console.log(`📰 [뉴스] ${keyword} 검색 중...`);
     const items = await searchNaverNews(keyword);
-    
-    for (const item of items) {
-      if (actualCounts.primaryNews >= targetCounts.primaryNews) break;
-      if (await isDuplicate(item.link)) continue;
-      
-      const title = stripHtml(item.title);
-      const description = stripHtml(item.description);
-      
-      console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithClaude(title, description);
-      
-      if (!analysis) {
-        console.log(`  ⏭️  관련 없음 - 스킵`);
-        continue;
-      }
-      
-      results.push({
-        source: 'news',
-        priority: 'primary',
-        keyword,
-        title,
-        content: description,
-        link: item.link,
-        postDate: item.postdate,
-        analysis,
-        timestamp: new Date().toISOString()
-      });
-      
-      actualCounts.primaryNews++;
-      console.log(`  ✅ 추가 (${actualCounts.primaryNews}/${targetCounts.primaryNews})`);
-      
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    
+    newsItems.push(...items);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // 2차 키워드 뉴스
-  console.log('\n📌 2차 키워드 뉴스 수집 (목표: 2개)');
-  for (const keyword of SECONDARY_KEYWORDS) {
-    if (actualCounts.secondaryNews >= targetCounts.secondaryNews) break;
+  console.log(`📊 총 ${newsItems.length}개 뉴스 검색 완료`);
+  console.log('🔍 필터링 중...');
+  
+  const filteredNews = [];
+  for (const item of newsItems) {
+    if (await isDuplicate(item.link)) continue;
     
-    console.log(`📰 [2차 뉴스] ${keyword}`);
-    const items = await searchNaverNews(keyword);
+    const title = stripHtml(item.title);
+    const description = stripHtml(item.description);
+    const filter = filterNews(title, description);
     
-    for (const item of items) {
-      if (actualCounts.secondaryNews >= targetCounts.secondaryNews) break;
-      if (await isDuplicate(item.link)) continue;
-      
-      const title = stripHtml(item.title);
-      const description = stripHtml(item.description);
-      
-      console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithClaude(title, description);
-      
-      if (!analysis) {
-        console.log(`  ⏭️  관련 없음 - 스킵`);
-        continue;
-      }
-      
-      results.push({
-        source: 'news',
-        priority: 'secondary',
-        keyword,
+    if (filter.pass) {
+      filteredNews.push({
+        item,
         title,
-        content: description,
-        link: item.link,
-        postDate: item.postdate,
-        analysis,
-        timestamp: new Date().toISOString()
+        description,
+        entities: filter.entities,
+        filterReason: filter.reason
       });
-      
-      actualCounts.secondaryNews++;
-      console.log(`  ✅ 추가 (${actualCounts.secondaryNews}/${targetCounts.secondaryNews})`);
-      
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+  
+  console.log(`✅ 필터 통과 뉴스: ${filteredNews.length}개`);
+  
+  // 뉴스 처리
+  console.log('\n📌 뉴스 분석 중...');
+  for (const data of filteredNews) {
+    if (actualCounts.news >= targetCounts.news) break;
+    
+    console.log(`  🤖 [뉴스] ${data.title.substring(0, 30)}...`);
+    console.log(`      반복 단어: ${data.entities}`);
+    const analysis = await analyzeWithClaude(data.title, data.description);
+    
+    if (!analysis) {
+      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
+      continue;
     }
     
-    await new Promise(resolve => setTimeout(resolve, 100));
+    results.push({
+      source: 'news',
+      priority: 'news',
+      keyword: data.entities,
+      title: data.title,
+      content: data.description,
+      link: data.item.link,
+      postDate: data.item.postdate,
+      analysis,
+      timestamp: new Date().toISOString()
+    });
+    
+    actualCounts.news++;
+    console.log(`  ✅ 추가 (${actualCounts.news}/${targetCounts.news})`);
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
   }
   
   console.log('');
   console.log('✅ 수집 완료!');
-  console.log(`📊 블로그: ${actualCounts.primaryBlog + actualCounts.secondaryBlog}개`);
-  console.log(`📊 뉴스: ${actualCounts.primaryNews + actualCounts.secondaryNews}개`);
+  console.log(`📊 1순위 블로그: ${actualCounts.priority1}개`);
+  console.log(`📊 2순위 블로그: ${actualCounts.priority2}개`);
+  console.log(`📊 3순위 블로그: ${actualCounts.priority3}개`);
+  console.log(`📊 뉴스: ${actualCounts.news}개`);
   console.log(`📊 총합: ${results.length}개`);
   
   return results;
@@ -498,8 +576,8 @@ async function main() {
   try {
     console.log('');
     console.log('═══════════════════════════════════════');
-    console.log('팀플레이 유형 데이터 수집기 v5.1 (Claude)');
-    console.log('긍정 유형 16개 + AI 분석');
+    console.log('팀플레이 유형 데이터 수집기 v5.2');
+    console.log('정교한 필터링 + Claude AI 분석');
     console.log('═══════════════════════════════════════');
     console.log(`시작: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`);
     console.log('');
