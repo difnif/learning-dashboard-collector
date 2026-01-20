@@ -1,0 +1,9 @@
+{
+  "name": "learning-dashboard-collector",
+  "version": "1.0.0",
+  "main": "collector.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "axios": "^1.6.0"
+  }
+}
