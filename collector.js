@@ -39,4 +39,4 @@ async function searchNaverBlog(keyword, display = 10) {
     });
     return response.data.items || [];
   } catch (error) {
-    console.error('Blog search error:', error.messag
+    console.error('Blog search error:', error.message);
