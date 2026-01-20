@@ -754,7 +754,7 @@
 <body>
   <!-- 로그인/회원가입 -->
   <div id="authContainer" class="auth-container">
-    <h1>🎓 학습 대시보드</h1>
+    <h1>팀플레이 유형 데이터 수집기</h1>
     <div id="loginForm">
       <div class="form-group">
         <label>이메일</label>
@@ -791,7 +791,7 @@
     <div class="container">
       <!-- 헤더 -->
       <div class="header">
-        <h1>🎓 학습 대시보드 v3.0</h1>
+        <h1>팀플레이 유형 데이터 수집기</h1>
         <div class="header-info">
           <span class="user-email" id="userEmail"></span>
           <button class="btn-logout" onclick="logout()">로그아웃</button>
@@ -1098,6 +1098,7 @@
                 ${item.frequency ? `<span class="meta-tag">빈도: ${item.frequency}회</span>` : ''}
               </div>
               ${item.description ? `<div class="item-preview">${item.description}</div>` : ''}
+              ${item.link ? `<a href="${item.link}" target="_blank" class="item-link" onclick="event.stopPropagation()">🔗 원문 보기</a>` : ''}
               <div class="item-options">
                 ${item.options ? item.options.map(opt => `
                   <button class="option-btn ${isKeyword ? '' : 'approve'}" onclick="event.stopPropagation(); ${isKeyword ? `handleKeywordDecision(${index}, '${opt.value || opt.label}')` : `handleClassification(${index}, '${opt.label}')`}">
@@ -1374,7 +1375,10 @@
       let footerHtml = '';
       if (type === 'approved') {
         footerHtml = `
-          <button class="modal-btn modal-btn-primary" onclick="changeDecision(${index}, 'rejected')">
+          <button class="modal-btn modal-btn-primary" onclick="reconsiderItem('approved', ${index})">
+            🔄 다시 검토
+          </button>
+          <button class="modal-btn modal-btn-secondary" onclick="changeDecision(${index}, 'rejected')">
             ↔️ 거절로 변경
           </button>
           <button class="modal-btn modal-btn-danger" onclick="deleteSingleItem('approved', ${index})">
@@ -1384,9 +1388,12 @@
             닫기
           </button>
         `;
-      } else if (type === 'rejected') {
+     } else if (type === 'rejected') {
         footerHtml = `
-          <button class="modal-btn modal-btn-primary" onclick="changeDecision(${index}, 'approved')">
+          <button class="modal-btn modal-btn-primary" onclick="reconsiderItem('rejected', ${index})">
+            🔄 다시 검토
+          </button>
+          <button class="modal-btn modal-btn-secondary" onclick="changeDecision(${index}, 'approved')">
             ↔️ 승인으로 변경
           </button>
           <button class="modal-btn modal-btn-danger" onclick="deleteSingleItem('rejected', ${index})">
@@ -1444,6 +1451,44 @@
       closeModal();
     }
 
+// 재검토 (approved/rejected → approvalQueue)
+    async function reconsiderItem(type, index) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      
+      const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
+      const item = items[index];
+      
+      // decision, decidedAt, selectedType 제거하고 원래 형태로
+      const { decision, decidedAt, selectedType, selectedOption, ...originalItem } = item;
+      
+      // 옵션 재구성
+      if (!originalItem.options && originalItem.category) {
+        // 기존에 승인/거절했던 항목이면 기본 옵션 추가
+        originalItem.options = [
+          { label: '무임승차형', percentage: 85 },
+          { label: '협력형', percentage: 70 }
+        ];
+        originalItem.type = 'classification';
+        originalItem.title = '재검토: 유형 결정';
+      }
+      
+      // 기존 배열에서 제거
+      const updatedItems = [...items];
+      updatedItems.splice(index, 1);
+      
+      // approvalQueue에 추가
+      const newQueue = [originalItem, ...(currentData.approvalQueue || [])];
+      
+      await userDocRef.update({
+        [type === 'approved' ? 'approvedItems' : 'rejectedItems']: updatedItems,
+        approvalQueue: newQueue,
+        [`stats.${type}`]: updatedItems.length,
+        'stats.pending': newQueue.length
+      });
+      
+      closeModal();
+    }
+    
     // 개별 삭제
     async function deleteSingleItem(type, index) {
       if (!confirm('이 항목을 삭제하시겠습니까?')) return;
