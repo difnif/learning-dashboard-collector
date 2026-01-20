@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 const axios = require('axios');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Anthropic = require('@anthropic-ai/sdk');
 
 // Firebase 초기화
 try {
@@ -17,11 +17,12 @@ try {
 const db = admin.firestore();
 const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-// Gemini AI 초기화
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+// Claude AI 초기화
+const anthropic = new Anthropic({
+  apiKey: ANTHROPIC_API_KEY,
+});
 
 // 키워드 분류
 const PRIMARY_KEYWORDS = [
@@ -43,10 +44,9 @@ async function isDuplicate(link) {
   return !snapshot.empty;
 }
 
-// Gemini로 케이스 분석
-async function analyzeWithGemini(title, description) {
-  const prompt = `
-다음은 팀 프로젝트나 협업에 관한 블로그/뉴스 내용입니다.
+// Claude로 케이스 분석
+async function analyzeWithClaude(title, description) {
+  const prompt = `다음은 팀 프로젝트나 협업에 관한 블로그/뉴스 내용입니다.
 
 제목: ${title}
 내용: ${description}
@@ -110,13 +110,19 @@ async function analyzeWithGemini(title, description) {
 }
 
 만약 이 내용이 팀플레이와 관련 없거나 부정적 내용만 있다면:
-{ "isRelevant": false, "reason": "이유" }
-`;
+{ "isRelevant": false, "reason": "이유" }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    });
+    
+    const text = message.content[0].text;
     
     // JSON 파싱
     const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -134,7 +140,7 @@ async function analyzeWithGemini(title, description) {
     
     return analysis;
   } catch (error) {
-    console.error('❌ Gemini 분석 오류:', error.message);
+    console.error('❌ Claude 분석 오류:', error.message);
     return null;
   }
 }
@@ -206,7 +212,7 @@ async function collectContent() {
   };
   
   // 1차 키워드 블로그
-  console.log('📌 1차 키워드 블로그 수집 (목표: 55개)');
+  console.log('📌 1차 키워드 블로그 수집 (목표: 10개)');
   for (const keyword of PRIMARY_KEYWORDS) {
     if (actualCounts.primaryBlog >= targetCounts.primaryBlog) break;
     
@@ -220,9 +226,9 @@ async function collectContent() {
       const title = stripHtml(item.title);
       const description = stripHtml(item.description);
       
-      // Gemini로 분석
+      // Claude로 분석
       console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithGemini(title, description);
+      const analysis = await analyzeWithClaude(title, description);
       
       if (!analysis) {
         console.log(`  ⏭️  관련 없음 - 스킵`);
@@ -252,7 +258,7 @@ async function collectContent() {
   }
   
   // 2차 키워드 블로그
-  console.log('\n📌 2차 키워드 블로그 수집 (목표: 25개)');
+  console.log('\n📌 2차 키워드 블로그 수집 (목표: 5개)');
   for (const keyword of SECONDARY_KEYWORDS) {
     if (actualCounts.secondaryBlog >= targetCounts.secondaryBlog) break;
     
@@ -267,7 +273,7 @@ async function collectContent() {
       const description = stripHtml(item.description);
       
       console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithGemini(title, description);
+      const analysis = await analyzeWithClaude(title, description);
       
       if (!analysis) {
         console.log(`  ⏭️  관련 없음 - 스킵`);
@@ -289,14 +295,14 @@ async function collectContent() {
       actualCounts.secondaryBlog++;
       console.log(`  ✅ 추가 (${actualCounts.secondaryBlog}/${targetCounts.secondaryBlog})`);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
   // 1차 키워드 뉴스
-  console.log('\n📌 1차 키워드 뉴스 수집 (목표: 15개)');
+  console.log('\n📌 1차 키워드 뉴스 수집 (목표: 3개)');
   for (const keyword of PRIMARY_KEYWORDS) {
     if (actualCounts.primaryNews >= targetCounts.primaryNews) break;
     
@@ -311,7 +317,7 @@ async function collectContent() {
       const description = stripHtml(item.description);
       
       console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithGemini(title, description);
+      const analysis = await analyzeWithClaude(title, description);
       
       if (!analysis) {
         console.log(`  ⏭️  관련 없음 - 스킵`);
@@ -333,14 +339,14 @@ async function collectContent() {
       actualCounts.primaryNews++;
       console.log(`  ✅ 추가 (${actualCounts.primaryNews}/${targetCounts.primaryNews})`);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
   // 2차 키워드 뉴스
-  console.log('\n📌 2차 키워드 뉴스 수집 (목표: 5개)');
+  console.log('\n📌 2차 키워드 뉴스 수집 (목표: 2개)');
   for (const keyword of SECONDARY_KEYWORDS) {
     if (actualCounts.secondaryNews >= targetCounts.secondaryNews) break;
     
@@ -355,7 +361,7 @@ async function collectContent() {
       const description = stripHtml(item.description);
       
       console.log(`  🤖 분석 중: ${title.substring(0, 30)}...`);
-      const analysis = await analyzeWithGemini(title, description);
+      const analysis = await analyzeWithClaude(title, description);
       
       if (!analysis) {
         console.log(`  ⏭️  관련 없음 - 스킵`);
@@ -377,7 +383,7 @@ async function collectContent() {
       actualCounts.secondaryNews++;
       console.log(`  ✅ 추가 (${actualCounts.secondaryNews}/${targetCounts.secondaryNews})`);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -492,7 +498,7 @@ async function main() {
   try {
     console.log('');
     console.log('═══════════════════════════════════════');
-    console.log('팀플레이 유형 데이터 수집기 v5.0 (Gemini)');
+    console.log('팀플레이 유형 데이터 수집기 v5.1 (Claude)');
     console.log('긍정 유형 16개 + AI 분석');
     console.log('═══════════════════════════════════════');
     console.log(`시작: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`);
