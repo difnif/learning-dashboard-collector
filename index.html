@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학습 대시보드 v2.0</title>
+  
+  <!-- PWA 메타 태그 -->
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="팀플 유형 학습 데이터 관리 대시보드">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuybreaKtSDrjIDsi5zrs7Trk5wiLAogICJzaG9ydF9uYW1lIjogIuybreaKtSDrjIDsi5zrs7Trk5wiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM2MzY2ZjEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXhNakFpSUdobGFXZG9kRDBpTVRJd0lqNDhjbVZqZENCM2FXUjBhRDBpTVRJd0lpQm9aV2xuYUhROUlqRXlNQ0lnWm1sc2JEMGlJell6TmpabU1TSXZQand2YzNablBnPT0iLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* 로그인 화면 */
+    .auth-container {
+      max-width: 400px;
+      margin: 100px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .auth-container h1 {
+      color: #6366f1;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #374151;
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #6366f1;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    
+    .btn:hover {
+      background: #4f46e5;
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      margin-top: 10px;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .auth-switch {
+      text-align: center;
+      margin-top: 20px;
+      color: #6b7280;
+    }
+    
+    .auth-switch a {
+      color: #6366f1;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    /* 대시보드 */
+    .dashboard {
+      display: none;
+    }
+    
+    .dashboard.active {
+      display: block;
+    }
+    
+    .header {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header h1 {
+      color: #6366f1;
+      font-size: 24px;
+    }
+    
+    .header-info {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .user-email {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    
+    .btn-logout {
+      padding: 8px 16px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .stat-label {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    
+    .stat-card.pending .stat-value {
+      color: #f59e0b;
+    }
+    
+    .stat-card.approved .stat-value {
+      color: #10b981;
+    }
+    
+    .stat-card.rejected .stat-value {
+      color: #ef4444;
+    }
+    
+    .section {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    
+    .badge {
+      background: #6366f1;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .approval-item {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border-left: 4px solid #6366f1;
+    }
+    
+    .approval-item.keyword-item {
+      border-left-color: #8b5cf6;
+      background: #faf5ff;
+    }
+    
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    
+    .item-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+    
+    .item-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    
+    .meta-tag {
+      background: white;
+      color: #6b7280;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    
+    .item-content {
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    
+    .item-description {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 12px;
+      padding: 10px;
+      background: white;
+      border-radius: 6px;
+    }
+    
+    .item-link {
+      color: #6366f1;
+      font-size: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    
+    .item-link:hover {
+      text-decoration: underline;
+    }
+    
+    .options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .option-btn {
+      padding: 8px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .option-btn:hover {
+      border-color: #6366f1;
+      background: #f0f0ff;
+    }
+    
+    .option-btn.approve {
+      border-color: #10b981;
+      color: #10b981;
+    }
+    
+    .option-btn.approve:hover {
+      background: #d1fae5;
+    }
+    
+    .option-btn.reject {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+    
+    .option-btn.reject:hover {
+      background: #fee2e2;
+    }
+    
+    .percentage-badge {
+      background: #6366f1;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    /* 최근 결정 섹션 */
+    .recent-decisions {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    .decision-item {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .decision-item.rejected {
+      border-left-color: #ef4444;
+    }
+    
+    .decision-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .decision-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .decision-status.approved {
+      color: #10b981;
+    }
+    
+    .decision-status.rejected {
+      color: #ef4444;
+    }
+    
+    .decision-time {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    
+    .decision-content {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    
+    .decision-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-reconsider {
+      padding: 6px 12px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-reconsider:hover {
+      background: #4f46e5;
+    }
+    
+    .btn-delete {
+      padding: 6px 12px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-delete:hover {
+      background: #4b5563;
+    }
+    
+    /* 활동 로그 */
+    .activity-item {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-time {
+      color: #6b7280;
+      font-size: 12px;
+      min-width: 60px;
+    }
+    
+    .activity-content {
+      flex: 1;
+      font-size: 14px;
+      color: #374151;
+    }
+    
+    .activity-action {
+      font-weight: 600;
+      color: #6366f1;
+    }
+    
+    /* 로딩 */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+    
+    /* 반응형 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .header-info {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .options {
+        flex-direction: column;
+      }
+      
+      .option-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 로그인/회원가입 -->
+  <div id="authContainer" class="auth-container">
+    <h1>🎓 학습 대시보드</h1>
+    <div id="loginForm">
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="loginEmail" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+      <button class="btn" onclick="login()">로그인</button>
+      <div class="auth-switch">
+        계정이 없으신가요? <a href="#" onclick="toggleAuth(); return false;">회원가입</a>
+      </div>
+    </div>
+    
+    <div id="signupForm" style="display: none;">
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="signupEmail" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="signupPassword" placeholder="••••••••">
+      </div>
+      <button class="btn" onclick="signup()">회원가입</button>
+      <div class="auth-switch">
+        이미 계정이 있으신가요? <a href="#" onclick="toggleAuth(); return false;">로그인</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 대시보드 -->
+  <div id="dashboard" class="dashboard">
+    <div class="container">
+      <!-- 헤더 -->
+      <div class="header">
+        <h1>🎓 학습 대시보드 v2.0</h1>
+        <div class="header-info">
+          <span class="user-email" id="userEmail"></span>
+          <button class="btn-logout" onclick="logout()">로그아웃</button>
+        </div>
+      </div>
+
+      <!-- 통계 -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-label">총 수집</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card pending">
+          <div class="stat-label">결정 대기</div>
+          <div class="stat-value" id="statPending">0</div>
+        </div>
+        <div class="stat-card approved">
+          <div class="stat-label">승인함</div>
+          <div class="stat-value" id="statApproved">0</div>
+        </div>
+        <div class="stat-card rejected">
+          <div class="stat-label">거절함</div>
+          <div class="stat-value" id="statRejected">0</div>
+        </div>
+      </div>
+
+      <!-- 결정 필요 -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">결정 필요</h2>
+          <span class="badge" id="pendingBadge">0</span>
+        </div>
+        <div id="approvalQueue"></div>
+      </div>
+
+      <!-- 최근 결정 (24시간) -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">최근 결정 (24시간 내)</h2>
+          <span class="badge" id="recentBadge">0</span>
+        </div>
+        <div id="recentDecisions" class="recent-decisions"></div>
+      </div>
+
+      <!-- 최근 활동 -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">최근 활동</h2>
+        </div>
+        <div id="activityLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmv5MlHGbzrZBw8lsMxt4vXYTwcetRcxI",
+      authDomain: "tpt-learning-49601.firebaseapp.com",
+      projectId: "tpt-learning-49601",
+      storageBucket: "tpt-learning-49601.firebasestorage.app",
+      messagingSenderId: "602423446232",
+      appId: "1:602423446232:web:48ebe5af774affda7225ad"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let unsubscribe = null;
+
+    // 인증 상태 감지
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        document.getElementById('userEmail').textContent = user.email;
+        loadDashboard();
+      } else {
+        currentUser = null;
+        document.getElementById('authContainer').style.display = 'block';
+        document.getElementById('dashboard').classList.remove('active');
+        if (unsubscribe) unsubscribe();
+      }
+    });
+
+    // 로그인/회원가입 토글
+    function toggleAuth() {
+      const login = document.getElementById('loginForm');
+      const signup = document.getElementById('signupForm');
+      if (login.style.display === 'none') {
+        login.style.display = 'block';
+        signup.style.display = 'none';
+      } else {
+        login.style.display = 'none';
+        signup.style.display = 'block';
+      }
+    }
+
+    // 로그인
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+      } catch (error) {
+        alert('로그인 실패: ' + error.message);
+      }
+    }
+
+    // 회원가입
+    async function signup() {
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        // 초기 데이터 생성
+        await db.collection('users').doc(userCredential.user.uid).set({
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          stats: { total: 0, pending: 0, approved: 0, rejected: 0 },
+          approvalQueue: [],
+          recentDecisions: [],
+          activities: []
+        });
+      } catch (error) {
+        alert('회원가입 실패: ' + error.message);
+      }
+    }
+
+    // 로그아웃
+    function logout() {
+      auth.signOut();
+    }
+
+    // 대시보드 로드
+    function loadDashboard() {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      
+      unsubscribe = userDocRef.onSnapshot(doc => {
+        if (!doc.exists) {
+          // 문서가 없으면 초기화
+          userDocRef.set({
+            email: currentUser.email,
+            stats: { total: 0, pending: 0, approved: 0, rejected: 0 },
+            approvalQueue: [],
+            recentDecisions: [],
+            activities: []
+          });
+          return;
+        }
+        
+        const data = doc.data();
+        
+        // 통계 업데이트
+        document.getElementById('statTotal').textContent = data.stats?.total || 0;
+        document.getElementById('statPending').textContent = data.stats?.pending || 0;
+        document.getElementById('statApproved').textContent = data.stats?.approved || 0;
+        document.getElementById('statRejected').textContent = data.stats?.rejected || 0;
+        
+        // 결정 필요 항목
+        renderApprovalQueue(data.approvalQueue || []);
+        
+        // 최근 결정
+        renderRecentDecisions(data.recentDecisions || []);
+        
+        // 활동 로그
+        renderActivities(data.activities || []);
+        
+        // 24시간 지난 항목 자동 삭제
+        cleanupOldDecisions(data.recentDecisions || []);
+      });
+    }
+
+    // 결정 필요 항목 렌더링
+    function renderApprovalQueue(queue) {
+      const container = document.getElementById('approvalQueue');
+      document.getElementById('pendingBadge').textContent = queue.length;
+      
+      if (queue.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <div>모든 항목을 처리했습니다!</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = queue.map((item, index) => {
+        if (item.type === 'keyword') {
+          // 키워드 제안
+          return `
+            <div class="approval-item keyword-item">
+              <div class="item-header">
+                <div>
+                  <div class="item-title">🔑 ${item.title}</div>
+                  <div class="item-meta">
+                    <span class="meta-tag">키워드: ${item.keyword}</span>
+                    <span class="meta-tag">빈도: ${item.frequency}회</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item-content">${item.content}</div>
+              <div class="item-description">${item.description}</div>
+              <div class="options">
+                ${item.options.map(opt => `
+                  <button class="option-btn" onclick="handleKeywordDecision(${index}, '${opt.value}')">
+                    ${opt.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        } else {
+          // 일반 분류
+          return `
+            <div class="approval-item">
+              <div class="item-header">
+                <div>
+                  <div class="item-title">${item.title}</div>
+                  <div class="item-meta">
+                    <span class="meta-tag">${item.source === 'blog' ? '📝 블로그' : '📰 뉴스'}</span>
+                    <span class="meta-tag">${item.keyword}</span>
+                    ${item.priority === 'primary' ? '<span class="meta-tag">1차 키워드</span>' : '<span class="meta-tag">2차 키워드</span>'}
+                  </div>
+                </div>
+              </div>
+              <div class="item-content">${item.content}</div>
+              ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
+              ${item.link ? `<a href="${item.link}" target="_blank" class="item-link">🔗 원문 보기</a>` : ''}
+              <div class="options">
+                ${item.options.map(opt => `
+                  <button class="option-btn" onclick="handleClassification(${index}, '${opt.label}')">
+                    ${opt.label}
+                    ${opt.percentage ? `<span class="percentage-badge">${opt.percentage}%</span>` : ''}
+                  </button>
+                `).join('')}
+                <button class="option-btn reject" onclick="handleReject(${index})">
+                  ❌ 거절
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    // 최근 결정 렌더링
+    function renderRecentDecisions(decisions) {
+      const container = document.getElementById('recentDecisions');
+      
+      // 24시간 이내만 필터링
+      const recent = decisions.filter(d => {
+        const decidedTime = d.decidedAt?.toMillis ? d.decidedAt.toMillis() : new Date(d.decidedAt).getTime();
+        return Date.now() - decidedTime < 86400000;
+      });
+      
+      document.getElementById('recentBadge').textContent = recent.length;
+      
+      if (recent.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div>최근 24시간 내 결정이 없습니다</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = recent.map((item, index) => {
+        const decidedTime = item.decidedAt?.toMillis ? item.decidedAt.toMillis() : new Date(item.decidedAt).getTime();
+        const timeAgo = getTimeAgo(decidedTime);
+        
+        return `
+          <div class="decision-item ${item.decision}">
+            <div class="decision-header">
+              <div class="decision-status ${item.decision}">
+                ${item.decision === 'approved' ? '✅ 승인함' : '❌ 거절함'}
+                ${item.selectedOption ? ` (${item.selectedOption === 'primary' ? '1차' : item.selectedOption === 'secondary' ? '2차' : '제외'})` : ''}
+              </div>
+              <div class="decision-time">${timeAgo}</div>
+            </div>
+            <div class="decision-content">${item.content || item.title}</div>
+            ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
+            <div class="decision-actions">
+              <button class="btn-reconsider" onclick="reconsider(${index})">
+                🔄 재검토
+              </button>
+              <button class="btn-delete" onclick="deleteDecision(${index})">
+                🗑️ 삭제
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 활동 로그 렌더링
+    function renderActivities(activities) {
+      const container = document.getElementById('activityLog');
+      
+      if (activities.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div>활동 기록이 없습니다</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = activities.slice(0, 20).map(activity => `
+        <div class="activity-item">
+          <div class="activity-time">${activity.time}</div>
+          <div class="activity-content">
+            <span class="activity-action">${activity.action}</span>
+            ${activity.content}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 분류 승인
+    async function handleClassification(index, selectedType) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userDocRef.get();
+      const data = doc.data();
+      
+      const item = data.approvalQueue[index];
+      const newQueue = [...data.approvalQueue];
+      newQueue.splice(index, 1);
+      
+      // 최근 결정에 추가
+      const recentDecisions = data.recentDecisions || [];
+      recentDecisions.unshift({
+        ...item,
+        decision: 'approved',
+        selectedType,
+        decidedAt: firebase.firestore.Timestamp.now()
+      });
+      
+      // 활동 추가
+      const activities = [{
+        time: '방금',
+        action: '승인',
+        content: `"${selectedType}" 유형으로 승인`
+      }, ...(data.activities || [])].slice(0, 20);
+      
+      await userDocRef.update({
+        approvalQueue: newQueue,
+        recentDecisions,
+        activities,
+        'stats.pending': data.stats.pending - 1,
+        'stats.approved': data.stats.approved + 1
+      });
+    }
+
+    // 키워드 제안 처리
+    async function handleKeywordDecision(index, selectedOption) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userDocRef.get();
+      const data = doc.data();
+      
+      const item = data.approvalQueue[index];
+      const newQueue = [...data.approvalQueue];
+      newQueue.splice(index, 1);
+      
+      const decision = selectedOption === 'exclude' ? 'rejected' : 'approved';
+      
+      // 최근 결정에 추가
+      const recentDecisions = data.recentDecisions || [];
+      recentDecisions.unshift({
+        ...item,
+        decision,
+        selectedOption,
+        decidedAt: firebase.firestore.Timestamp.now()
+      });
+      
+      // 활동 추가
+      const optionText = selectedOption === 'primary' ? '1차 키워드' : selectedOption === 'secondary' ? '2차 키워드' : '제외';
+      const activities = [{
+        time: '방금',
+        action: decision === 'approved' ? '승인' : '거절',
+        content: `키워드 "${item.keyword}"를 ${optionText}로 결정`
+      }, ...(data.activities || [])].slice(0, 20);
+      
+      await userDocRef.update({
+        approvalQueue: newQueue,
+        recentDecisions,
+        activities,
+        'stats.pending': data.stats.pending - 1,
+        [`stats.${decision === 'approved' ? 'approved' : 'rejected'}`]: data.stats[decision === 'approved' ? 'approved' : 'rejected'] + 1
+      });
+    }
+
+    // 거절
+    async function handleReject(index) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userDocRef.get();
+      const data = doc.data();
+      
+      const item = data.approvalQueue[index];
+      const newQueue = [...data.approvalQueue];
+      newQueue.splice(index, 1);
+      
+      // 최근 결정에 추가
+      const recentDecisions = data.recentDecisions || [];
+      recentDecisions.unshift({
+        ...item,
+        decision: 'rejected',
+        decidedAt: firebase.firestore.Timestamp.now()
+      });
+      
+      // 활동 추가
+      const activities = [{
+        time: '방금',
+        action: '거절',
+        content: `항목 거절`
+      }, ...(data.activities || [])].slice(0, 20);
+      
+      await userDocRef.update({
+        approvalQueue: newQueue,
+        recentDecisions,
+        activities,
+        'stats.pending': data.stats.pending - 1,
+        'stats.rejected': data.stats.rejected + 1
+      });
+    }
+
+    // 재검토 (최근 결정 → 결정 필요로 이동)
+    async function reconsider(index) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userDocRef.get();
+      const data = doc.data();
+      
+      const recentDecisions = data.recentDecisions || [];
+      const item = recentDecisions[index];
+      
+      // 24시간 이내만 필터링
+      const validDecisions = recentDecisions.filter(d => {
+        const decidedTime = d.decidedAt?.toMillis ? d.decidedAt.toMillis() : new Date(d.decidedAt).getTime();
+        return Date.now() - decidedTime < 86400000;
+      });
+      
+      const newRecentDecisions = [...validDecisions];
+      newRecentDecisions.splice(index, 1);
+      
+      // 원래 항목으로 복원 (decision, decidedAt 제거)
+      const { decision, decidedAt, selectedType, selectedOption, ...originalItem } = item;
+      
+      // 결정 필요로 이동
+      const approvalQueue = [originalItem, ...(data.approvalQueue || [])];
+      
+      // 통계 조정
+      const statChange = decision === 'approved' ? 'approved' : 'rejected';
+      
+      // 활동 추가
+      const activities = [{
+        time: '방금',
+        action: '재검토',
+        content: `결정 취소 후 재검토`
+      }, ...(data.activities || [])].slice(0, 20);
+      
+      await userDocRef.update({
+        approvalQueue,
+        recentDecisions: newRecentDecisions,
+        activities,
+        'stats.pending': data.stats.pending + 1,
+        [`stats.${statChange}`]: data.stats[statChange] - 1
+      });
+    }
+
+    // 결정 삭제
+    async function deleteDecision(index) {
+      if (!confirm('이 결정을 영구 삭제하시겠습니까?')) return;
+      
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const doc = await userDocRef.get();
+      const data = doc.data();
+      
+      const recentDecisions = data.recentDecisions || [];
+      
+      // 24시간 이내만 필터링
+      const validDecisions = recentDecisions.filter(d => {
+        const decidedTime = d.decidedAt?.toMillis ? d.decidedAt.toMillis() : new Date(d.decidedAt).getTime();
+        return Date.now() - decidedTime < 86400000;
+      });
+      
+      const newRecentDecisions = [...validDecisions];
+      newRecentDecisions.splice(index, 1);
+      
+      await userDocRef.update({
+        recentDecisions: newRecentDecisions
+      });
+    }
+
+    // 24시간 지난 결정 자동 삭제
+    async function cleanupOldDecisions(decisions) {
+      const validDecisions = decisions.filter(d => {
+        const decidedTime = d.decidedAt?.toMillis ? d.decidedAt.toMillis() : new Date(d.decidedAt).getTime();
+        return Date.now() - decidedTime < 86400000;
+      });
+      
+      if (validDecisions.length !== decisions.length) {
+        const userDocRef = db.collection('users').doc(currentUser.uid);
+        await userDocRef.update({
+          recentDecisions: validDecisions
+        });
+      }
+    }
+
+    // 시간 표시 (상대적)
+    function getTimeAgo(timestamp) {
+      const diff = Date.now() - timestamp;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      
+      if (minutes < 1) return '방금';
+      if (minutes < 60) return `${minutes}분 전`;
+      if (hours < 24) return `${hours}시간 전`;
+      return '하루 이상';
+    }
+
+    // PWA 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('data:text/javascript;base64,')
+        .catch(err => console.log('SW registration failed'));
+    }
+  </script>
+</body>
+</html>
