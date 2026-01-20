@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>팀플레이 유형 데이터 수집기</title>
+  <title>팀플레이 유형 데이터</title>
   
-  <!-- PWA 메타 태그 -->
   <meta name="theme-color" content="#6366f1">
-  <meta name="description" content="팀플 유형 학습 데이터 관리 대시보드">
-  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuybreaKtSDrjIDsi5zrs7Trk5wiLAogICJzaG9ydF9uYW1lIjogIuybreaKtSDrjIDsi5zrs7Trk5wiLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiM2MzY2ZjEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXhNakFpSUdobGFXZG9kRDBpTVRJd0lqNDhjbVZqZENCM2FXUjBhRDBpTVRJd0lpQm9aV2xuYUhROUlqRXlNQ0lnWm1sc2JEMGlJell6TmpabU1TSXZQand2YzNablBnPT0iLAogICAgICAic2l6ZXMiOiAiMTkyeDE5MiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+  <meta name="description" content="팀플레이 유형 데이터 관리 시스템">
   
   <style>
     * {
@@ -43,6 +41,7 @@
       color: #6366f1;
       margin-bottom: 30px;
       text-align: center;
+      font-size: 24px;
     }
     
     .form-group {
@@ -62,7 +61,6 @@
       border: 2px solid #e5e7eb;
       border-radius: 8px;
       font-size: 14px;
-      transition: border-color 0.3s;
     }
     
     .form-group input:focus {
@@ -80,7 +78,6 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
     }
     
     .btn:hover {
@@ -187,7 +184,7 @@
       color: #ef4444;
     }
     
-    /* 탭 네비게이션 */
+    /* 탭 */
     .tabs {
       background: white;
       border-radius: 15px;
@@ -211,7 +208,6 @@
       font-weight: 600;
       color: #6b7280;
       cursor: pointer;
-      transition: all 0.3s;
       position: relative;
     }
     
@@ -259,91 +255,148 @@
       display: block;
     }
     
-    /* 도구 모음 */
-    .toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 15px;
+    /* 검색 */
+    .search-panel {
       background: #f9fafb;
+      padding: 20px;
       border-radius: 10px;
+      margin-bottom: 20px;
     }
     
-    .checkbox-all {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-    
-    .checkbox-all input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-    
-    .checkbox-all label {
-      font-weight: 600;
-      color: #374151;
-      cursor: pointer;
-    }
-    
-    .toolbar-actions {
+    .search-filters {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
     
-    .btn-delete-selected {
-      padding: 8px 16px;
-      background: #ef4444;
+    .search-filters select,
+    .search-filters input {
+      padding: 10px;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .search-filters select {
+      min-width: 150px;
+    }
+    
+    .search-filters input {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .search-filters button {
+      padding: 10px 20px;
+      background: #6366f1;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
       font-weight: 600;
-      display: none;
     }
     
-    .btn-delete-selected.visible {
-      display: block;
+    .search-filters button:hover {
+      background: #4f46e5;
     }
     
-    .btn-delete-selected:hover {
-      background: #dc2626;
+    /* 카테고리 트리 */
+    .category-group {
+      margin-bottom: 20px;
     }
     
-    /* 날짜 그룹 */
-    .date-group {
-      margin-bottom: 25px;
-    }
-    
-    .date-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
+    .category-header {
       background: #f3f4f6;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-    
-    .date-header input {
-      width: 18px;
-      height: 18px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 600;
       cursor: pointer;
     }
     
-    .date-title {
-      font-weight: 600;
-      color: #374151;
-      flex: 1;
+    .category-header:hover {
+      background: #e5e7eb;
     }
     
-    .date-count {
+    .category-children {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+    
+    .subcategory {
+      margin-bottom: 15px;
+    }
+    
+    .subcategory-header {
+      background: #fef3c7;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .subcategory-header:hover {
+      background: #fde68a;
+    }
+    
+    .subcategory-cases {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+    
+    /* 케이스 카드 */
+    .case-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .case-card:hover {
+      border-color: #6366f1;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    }
+    
+    .case-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #1f2937;
+    }
+    
+    .case-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    
+    .detail-row {
+      font-size: 13px;
       color: #6b7280;
-      font-size: 14px;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    
+    .detail-value {
+      color: #374151;
+    }
+    
+    .case-link {
+      color: #6366f1;
+      text-decoration: none;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+    
+    .case-link:hover {
+      text-decoration: underline;
     }
     
     /* 항목 */
@@ -353,64 +406,20 @@
       border-radius: 10px;
       margin-bottom: 12px;
       border-left: 4px solid #6366f1;
-      display: flex;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .item:hover {
-      background: #f3f4f6;
-      transform: translateX(4px);
-    }
-    
-    .item.approved {
-      border-left-color: #10b981;
-    }
-    
-    .item.rejected {
-      border-left-color: #ef4444;
-    }
-    
-    .item.keyword-item {
-      border-left-color: #8b5cf6;
-      background: #faf5ff;
-    }
-    
-    .item-checkbox {
-      display: flex;
-      align-items: start;
-      padding-top: 4px;
-    }
-    
-    .item-checkbox input {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-    
-    .item-content-wrapper {
-      flex: 1;
-    }
-    
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
     }
     
     .item-title {
       font-size: 15px;
       font-weight: 600;
       color: #1f2937;
-      line-height: 1.4;
+      margin-bottom: 8px;
     }
     
     .item-meta {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-bottom: 8px;
     }
     
     .meta-tag {
@@ -424,21 +433,39 @@
     .item-preview {
       color: #6b7280;
       font-size: 13px;
-      margin-top: 8px;
+      margin: 8px 0;
       line-height: 1.5;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
     }
     
-    /* 옵션 버튼들 (결정 필요 탭용) */
+    .item-link {
+      color: #6366f1;
+      font-size: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin: 8px 0;
+    }
+    
+    .item-link:hover {
+      text-decoration: underline;
+    }
+    
     .item-options {
       display: flex;
       gap: 8px;
       margin-top: 12px;
       flex-wrap: wrap;
+    }
+    
+    .option-section {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .option-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 8px;
     }
     
     .option-btn {
@@ -448,7 +475,6 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 13px;
-      transition: all 0.3s;
     }
     
     .option-btn:hover {
@@ -484,7 +510,7 @@
       margin-left: 4px;
     }
     
-    /* 상세보기 모달 */
+    /* 모달 */
     .modal {
       display: none;
       position: fixed;
@@ -578,42 +604,23 @@
       text-decoration: underline;
     }
     
-    .modal-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    
-    .modal-status.approved {
-      background: #d1fae5;
-      color: #10b981;
-    }
-    
-    .modal-status.rejected {
-      background: #fee2e2;
-      color: #ef4444;
-    }
-    
     .modal-footer {
       padding: 20px 25px;
       border-top: 2px solid #e5e7eb;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
     
     .modal-btn {
       flex: 1;
+      min-width: 120px;
       padding: 12px;
       border: none;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
     }
     
     .modal-btn-primary {
@@ -660,40 +667,48 @@
       font-size: 16px;
     }
     
-    /* 알림 권한 배너 */
-    .notification-banner {
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-      color: white;
-      padding: 15px 25px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    /* 분류 근거 */
+    .reason-box {
+      background: #f9fafb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
     }
     
-    .notification-banner.hidden {
-      display: none;
-    }
-    
-    .notification-text {
-      font-size: 14px;
-      font-weight: 500;
-    }
-    
-    .btn-enable-notifications {
-      padding: 8px 16px;
-      background: white;
-      color: #f59e0b;
-      border: none;
-      border-radius: 6px;
+    .reason-title {
+      font-size: 13px;
       font-weight: 600;
-      cursor: pointer;
+      color: #6b7280;
+      margin-bottom: 8px;
     }
     
-    .btn-enable-notifications:hover {
-      background: #fef3c7;
+    .reason-content {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    
+    .reason-keywords {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    
+    .reason-keyword {
+      background: #e0e7ff;
+      color: #4f46e5;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    
+    .problem-tag {
+      background: #fee2e2;
+      color: #dc2626;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
     }
     
     /* 반응형 */
@@ -720,33 +735,25 @@
         flex-direction: column;
       }
       
-      .tab-btn {
-        border-bottom: 1px solid #e5e7eb;
-      }
-      
-      .tab-btn.active::after {
-        left: 0;
-        right: auto;
-        width: 4px;
-        height: 100%;
-        bottom: 0;
-      }
-      
-      .toolbar {
+      .search-filters {
         flex-direction: column;
-        gap: 12px;
       }
       
-      .toolbar-actions {
+      .search-filters select,
+      .search-filters input {
         width: 100%;
       }
       
-      .btn-delete-selected {
-        width: 100%;
+      .case-details {
+        grid-template-columns: 1fr;
       }
       
       .modal-footer {
         flex-direction: column;
+      }
+      
+      .modal-btn {
+        width: 100%;
       }
     }
   </style>
@@ -754,7 +761,7 @@
 <body>
   <!-- 로그인/회원가입 -->
   <div id="authContainer" class="auth-container">
-    <h1>팀플레이 유형 데이터 수집기</h1>
+    <h1>팀플레이 유형 데이터</h1>
     <div id="loginForm">
       <div class="form-group">
         <label>이메일</label>
@@ -791,21 +798,11 @@
     <div class="container">
       <!-- 헤더 -->
       <div class="header">
-        <h1>팀플레이 유형 데이터 수집기</h1>
+        <h1>팀플레이 유형 데이터</h1>
         <div class="header-info">
           <span class="user-email" id="userEmail"></span>
           <button class="btn-logout" onclick="logout()">로그아웃</button>
         </div>
-      </div>
-
-      <!-- 알림 권한 배너 -->
-      <div id="notificationBanner" class="notification-banner hidden">
-        <div class="notification-text">
-          🔔 새로운 결정 항목이 생기면 알림을 받으시겠습니까?
-        </div>
-        <button class="btn-enable-notifications" onclick="requestNotificationPermission()">
-          알림 허용
-        </button>
       </div>
 
       <!-- 통계 -->
@@ -843,6 +840,10 @@
             거절함
             <span class="tab-badge" id="rejectedCount">0</span>
           </button>
+          <button class="tab-btn" data-tab="categories">
+            카테고리별 보기
+            <span class="tab-badge" id="categoriesCount">0</span>
+          </button>
         </div>
         
         <div class="tab-content">
@@ -853,15 +854,42 @@
           
           <!-- 승인함 -->
           <div class="tab-pane" id="approvedPane">
-            <div class="toolbar">
-              <div class="checkbox-all">
-                <input type="checkbox" id="approvedCheckAll" onchange="toggleCheckAll('approved')">
-                <label for="approvedCheckAll">전체 선택</label>
-              </div>
-              <div class="toolbar-actions">
-                <button class="btn-delete-selected" id="approvedDeleteBtn" onclick="deleteSelected('approved')">
-                  🗑️ 선택 삭제
-                </button>
+            <div class="search-panel">
+              <div class="search-filters">
+                <select id="searchSubject">
+                  <option value="">전체 주체</option>
+                  <option value="학생">학생</option>
+                  <option value="직장인">직장인</option>
+                  <option value="정치인">정치인</option>
+                  <option value="크리에이터">크리에이터</option>
+                  <option value="활동가">활동가</option>
+                  <option value="기업/단체">기업/단체</option>
+                  <option value="개발자">개발자</option>
+                </select>
+                
+                <select id="searchType">
+                  <option value="">전체 유형</option>
+                  <option value="주도형">주도형</option>
+                  <option value="비전제시형">비전제시형</option>
+                  <option value="전략가형">전략가형</option>
+                  <option value="실행형">실행형</option>
+                  <option value="완수형">완수형</option>
+                  <option value="속도형">속도형</option>
+                  <option value="협력형">협력형</option>
+                  <option value="조율자형">조율자형</option>
+                  <option value="지원형">지원형</option>
+                  <option value="소통형">소통형</option>
+                  <option value="경청형">경청형</option>
+                  <option value="중재형">중재형</option>
+                  <option value="혁신형">혁신형</option>
+                  <option value="창의형">창의형</option>
+                  <option value="분석형">분석형</option>
+                  <option value="신뢰구축형">신뢰구축형</option>
+                </select>
+                
+                <input type="text" id="searchContent" placeholder="내용 검색...">
+                
+                <button onclick="searchCases()">검색</button>
               </div>
             </div>
             <div id="approvedItems"></div>
@@ -869,18 +897,12 @@
           
           <!-- 거절함 -->
           <div class="tab-pane" id="rejectedPane">
-            <div class="toolbar">
-              <div class="checkbox-all">
-                <input type="checkbox" id="rejectedCheckAll" onchange="toggleCheckAll('rejected')">
-                <label for="rejectedCheckAll">전체 선택</label>
-              </div>
-              <div class="toolbar-actions">
-                <button class="btn-delete-selected" id="rejectedDeleteBtn" onclick="deleteSelected('rejected')">
-                  🗑️ 선택 삭제
-                </button>
-              </div>
-            </div>
             <div id="rejectedItems"></div>
+          </div>
+          
+          <!-- 카테고리별 보기 -->
+          <div class="tab-pane" id="categoriesPane">
+            <div id="categoryTree"></div>
           </div>
         </div>
       </div>
@@ -894,24 +916,7 @@
         <h2 class="modal-title" id="modalTitle"></h2>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
-      <div class="modal-body">
-        <div class="modal-section">
-          <div class="modal-label">상태</div>
-          <div id="modalStatus"></div>
-        </div>
-        <div class="modal-section">
-          <div class="modal-label">메타 정보</div>
-          <div id="modalMeta"></div>
-        </div>
-        <div class="modal-section" id="modalDescSection" style="display: none;">
-          <div class="modal-label">내용</div>
-          <div class="modal-text" id="modalDescription"></div>
-        </div>
-        <div class="modal-section" id="modalLinkSection" style="display: none;">
-          <div class="modal-label">링크</div>
-          <a class="modal-link" id="modalLink" target="_blank"></a>
-        </div>
-      </div>
+      <div class="modal-body" id="modalBody"></div>
       <div class="modal-footer" id="modalFooter"></div>
     </div>
   </div>
@@ -939,10 +944,6 @@
     let currentUser = null;
     let unsubscribe = null;
     let currentData = null;
-    let selectedItems = { approved: new Set(), rejected: new Set() };
-    let currentModalItem = null;
-    let currentModalType = null;
-    let lastPendingCount = 0;
 
     // 인증 상태 감지
     auth.onAuthStateChanged(user => {
@@ -952,7 +953,6 @@
         document.getElementById('dashboard').classList.add('active');
         document.getElementById('userEmail').textContent = user.email;
         loadDashboard();
-        checkNotificationPermission();
       } else {
         currentUser = null;
         document.getElementById('authContainer').style.display = 'block';
@@ -966,17 +966,19 @@
       btn.addEventListener('click', () => {
         const tab = btn.dataset.tab;
         
-        // 버튼 활성화
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         
-        // 패널 표시
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
         document.getElementById(tab + 'Pane').classList.add('active');
+        
+        if (tab === 'categories') {
+          renderCategoryTree(currentData?.approvedItems || []);
+        }
       });
     });
 
-    // 로그인/회원가입 토글
+    // 로그인/회원가입
     function toggleAuth() {
       const login = document.getElementById('loginForm');
       const signup = document.getElementById('signupForm');
@@ -989,7 +991,6 @@
       }
     }
 
-    // 로그인
     async function login() {
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -1001,7 +1002,6 @@
       }
     }
 
-    // 회원가입
     async function signup() {
       const email = document.getElementById('signupEmail').value;
       const password = document.getElementById('signupPassword').value;
@@ -1014,15 +1014,13 @@
           stats: { total: 0, pending: 0, approved: 0, rejected: 0 },
           approvalQueue: [],
           approvedItems: [],
-          rejectedItems: [],
-          activities: []
+          rejectedItems: []
         });
       } catch (error) {
         alert('회원가입 실패: ' + error.message);
       }
     }
 
-    // 로그아웃
     function logout() {
       auth.signOut();
     }
@@ -1038,8 +1036,7 @@
             stats: { total: 0, pending: 0, approved: 0, rejected: 0 },
             approvalQueue: [],
             approvedItems: [],
-            rejectedItems: [],
-            activities: []
+            rejectedItems: []
           });
           return;
         }
@@ -1047,7 +1044,7 @@
         const data = doc.data();
         currentData = data;
         
-        // 통계 업데이트
+        // 통계
         document.getElementById('statTotal').textContent = data.stats?.total || 0;
         document.getElementById('statPending').textContent = data.stats?.pending || 0;
         document.getElementById('statApproved').textContent = data.stats?.approved || 0;
@@ -1057,14 +1054,12 @@
         document.getElementById('pendingCount').textContent = (data.approvalQueue || []).length;
         document.getElementById('approvedCount').textContent = (data.approvedItems || []).length;
         document.getElementById('rejectedCount').textContent = (data.rejectedItems || []).length;
+        document.getElementById('categoriesCount').textContent = (data.approvedItems || []).length;
         
         // 렌더링
         renderPendingItems(data.approvalQueue || []);
         renderApprovedItems(data.approvedItems || []);
         renderRejectedItems(data.rejectedItems || []);
-        
-        // 알림 체크
-        checkForNewPending(data.approvalQueue || []);
       });
     }
 
@@ -1083,401 +1078,464 @@
       }
       
       container.innerHTML = items.map((item, index) => {
-        const isKeyword = item.type === 'keyword';
-        
-        return `
-          <div class="item ${isKeyword ? 'keyword-item' : ''}" onclick="event.stopPropagation()">
-            <div class="item-content-wrapper">
-              <div class="item-header">
-                <div class="item-title">${isKeyword ? '🔑 ' : ''}${item.title || item.content}</div>
-              </div>
-              <div class="item-meta">
-                ${item.source ? `<span class="meta-tag">${item.source === 'blog' ? '📝 블로그' : '📰 뉴스'}</span>` : ''}
-                ${item.keyword ? `<span class="meta-tag">${item.keyword}</span>` : ''}
-                ${item.priority === 'primary' ? '<span class="meta-tag">1차</span>' : item.priority === 'secondary' ? '<span class="meta-tag">2차</span>' : ''}
-                ${item.frequency ? `<span class="meta-tag">빈도: ${item.frequency}회</span>` : ''}
-              </div>
-              ${item.description ? `<div class="item-preview">${item.description}</div>` : ''}
-              ${item.link ? `<a href="${item.link}" target="_blank" class="item-link" onclick="event.stopPropagation()">🔗 원문 보기</a>` : ''}
-              <div class="item-options">
-                ${item.options ? item.options.map(opt => `
-                  <button class="option-btn ${isKeyword ? '' : 'approve'}" onclick="event.stopPropagation(); ${isKeyword ? `handleKeywordDecision(${index}, '${opt.value || opt.label}')` : `handleClassification(${index}, '${opt.label}')`}">
-                    ${opt.label}
-                    ${opt.percentage ? `<span class="percentage-badge">${opt.percentage}%</span>` : ''}
+        if (item.type === 'keyword') {
+          return `
+            <div class="item">
+              <div class="item-title">새 키워드 제안: "${item.keyword}"</div>
+              <div class="item-preview">${item.description}</div>
+              
+              <div class="option-section">
+                <div class="option-section-title">주제 분류</div>
+                <div class="item-options">
+                  <button class="option-btn" onclick="handleKeywordCategory('${index}', 'primary')">
+                    1차 카테고리
                   </button>
-                `).join('') : ''}
-                ${!isKeyword ? `<button class="option-btn reject" onclick="event.stopPropagation(); handleReject(${index})">❌ 거절</button>` : ''}
+                  <button class="option-btn" onclick="handleKeywordCategory('${index}', 'secondary')">
+                    2차 카테고리
+                  </button>
+                  <button class="option-btn" onclick="handleKeywordCategory('${index}', 'exclude')">
+                    제외
+                  </button>
+                </div>
+              </div>
+              
+              <div class="option-section">
+                <div class="option-section-title">검색 키워드</div>
+                <div class="item-options">
+                  <button class="option-btn approve" onclick="handleKeywordSearch('${index}', 'use')">
+                    반영
+                  </button>
+                  <button class="option-btn reject" onclick="handleKeywordSearch('${index}', 'ignore')">
+                    제외
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          return `
+            <div class="item">
+              <div class="item-title">${item.title}</div>
+              <div class="item-meta">
+                <span class="meta-tag">${item.source === 'blog' ? '블로그' : '뉴스'}</span>
+                <span class="meta-tag">${item.keyword}</span>
+                ${item.postDate ? `<span class="meta-tag">${item.postDate}</span>` : ''}
+              </div>
+              ${item.content ? `<div class="item-preview">${item.content}</div>` : ''}
+              ${item.link ? `<a href="${item.link}" target="_blank" class="item-link" onclick="event.stopPropagation()">원문 보기</a>` : ''}
+              
+              <div class="option-section">
+                <div class="option-section-title">행위 주체</div>
+                <div class="item-options">
+                  ${item.subjectOptions?.map((opt, i) => `
+                    <button class="option-btn" onclick="selectSubject(${index}, ${i})">
+                      ${opt.label}
+                      <span class="percentage-badge">${opt.confidence}%</span>
+                    </button>
+                  `).join('') || ''}
+                </div>
+              </div>
+              
+              <div class="option-section">
+                <div class="option-section-title">긍정적 유형</div>
+                <div class="item-options">
+                  ${item.typeOptions?.map((opt, i) => `
+                    <button class="option-btn" onclick="selectType(${index}, ${i})">
+                      ${opt.type}
+                      <span class="percentage-badge">${opt.confidence}%</span>
+                    </button>
+                  `).join('') || ''}
+                </div>
+              </div>
+              
+              <div class="item-options">
+                <button class="option-btn reject" onclick="rejectItem(${index})">
+                  반려
+                </button>
+              </div>
+            </div>
+          `;
+        }
       }).join('');
     }
 
-    // 승인함 렌더링
+    // 승인함/거절함 렌더링
     function renderApprovedItems(items) {
       const container = document.getElementById('approvedItems');
       
       if (items.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
             <div class="empty-state-text">승인한 항목이 없습니다</div>
           </div>
         `;
         return;
       }
       
-      // 날짜별 그룹핑
-      const grouped = groupByDate(items);
-      
-      container.innerHTML = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).map(date => {
-        const dateItems = grouped[date];
-        return `
-          <div class="date-group">
-            <div class="date-header">
-              <input type="checkbox" onchange="toggleDateGroup('approved', '${date}', this.checked)">
-              <span class="date-title">${formatDate(date)}</span>
-              <span class="date-count">${dateItems.length}개</span>
+      container.innerHTML = items.map((item, index) => `
+        <div class="case-card" onclick="showDetail('approved', ${index})">
+          <div class="case-title">${item.title}</div>
+          <div class="case-details">
+            <div class="detail-row">
+              <span class="detail-label">주체:</span>
+              <span class="detail-value">${item.selectedSubject || '미지정'}</span>
             </div>
-            ${dateItems.map((item, index) => renderItem(item, 'approved', item.originalIndex)).join('')}
+            <div class="detail-row">
+              <span class="detail-label">유형:</span>
+              <span class="detail-value">${item.selectedType || '미지정'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">데이터:</span>
+              <span class="detail-value">${item.source === 'blog' ? '블로그' : '뉴스'}</span>
+            </div>
+            ${item.postDate ? `
+              <div class="detail-row">
+                <span class="detail-label">날짜:</span>
+                <span class="detail-value">${item.postDate}</span>
+              </div>
+            ` : ''}
           </div>
-        `;
-      }).join('');
-      
-      updateDeleteButton('approved');
+          ${item.link ? `<a href="${item.link}" target="_blank" class="case-link" onclick="event.stopPropagation()">원문 보기</a>` : ''}
+        </div>
+      `).join('');
     }
 
-    // 거절함 렌더링
     function renderRejectedItems(items) {
       const container = document.getElementById('rejectedItems');
       
       if (items.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
             <div class="empty-state-text">거절한 항목이 없습니다</div>
           </div>
         `;
         return;
       }
       
-      // 날짜별 그룹핑
-      const grouped = groupByDate(items);
+      container.innerHTML = items.map((item, index) => `
+        <div class="case-card" onclick="showDetail('rejected', ${index})">
+          <div class="case-title">${item.title || item.content}</div>
+          ${item.link ? `<a href="${item.link}" target="_blank" class="case-link" onclick="event.stopPropagation()">원문 보기</a>` : ''}
+        </div>
+      `).join('');
+    }
+
+    // 카테고리 트리 렌더링
+    function renderCategoryTree(items) {
+      const container = document.getElementById('categoryTree');
       
-      container.innerHTML = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a)).map(date => {
-        const dateItems = grouped[date];
-        return `
-          <div class="date-group">
-            <div class="date-header">
-              <input type="checkbox" onchange="toggleDateGroup('rejected', '${date}', this.checked)">
-              <span class="date-title">${formatDate(date)}</span>
-              <span class="date-count">${dateItems.length}개</span>
-            </div>
-            ${dateItems.map((item, index) => renderItem(item, 'rejected', item.originalIndex)).join('')}
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-text">승인한 항목이 없습니다</div>
           </div>
         `;
-      }).join('');
+        return;
+      }
       
-      updateDeleteButton('rejected');
-    }
-
-    // 개별 항목 렌더링
-    function renderItem(item, type, index) {
-      const id = `${type}-${index}`;
-      const isChecked = selectedItems[type].has(index);
+      // 카테고리별 그룹핑
+      const tree = {};
+      items.forEach(item => {
+        const primary = item.primaryCategory || '미분류';
+        if (!tree[primary]) tree[primary] = [];
+        tree[primary].push(item);
+      });
       
-      return `
-        <div class="item ${type}" onclick="showDetail('${type}', ${index})">
-          <div class="item-checkbox">
-            <input type="checkbox" ${isChecked ? 'checked' : ''} 
-                   onchange="event.stopPropagation(); toggleItem('${type}', ${index}, this.checked)"
-                   onclick="event.stopPropagation()">
-          </div>
-          <div class="item-content-wrapper">
-            <div class="item-title">${item.title || item.content}</div>
-            <div class="item-meta">
-              ${item.source ? `<span class="meta-tag">${item.source === 'blog' ? '📝 블로그' : '📰 뉴스'}</span>` : ''}
-              ${item.keyword ? `<span class="meta-tag">${item.keyword}</span>` : ''}
-              ${item.selectedType ? `<span class="meta-tag">유형: ${item.selectedType}</span>` : ''}
-              ${item.selectedOption ? `<span class="meta-tag">${item.selectedOption === 'primary' ? '1차' : item.selectedOption === 'secondary' ? '2차' : '제외'}</span>` : ''}
+      let html = '';
+      for (const [category, cases] of Object.entries(tree)) {
+        html += `
+          <div class="category-group">
+            <div class="category-header" onclick="toggleCategory('${category}')">
+              ${category} (${cases.length}건)
             </div>
-            ${item.description ? `<div class="item-preview">${item.description}</div>` : ''}
+            <div class="category-children" id="cat-${category}" style="display: none;">
+        `;
+        
+        cases.forEach((item, index) => {
+          html += `
+            <div class="case-card" onclick="showCategoryDetail('${category}', ${index})">
+              <div class="case-title">${item.title}</div>
+              <div class="case-details">
+                <div class="detail-row">
+                  <span class="detail-label">주체:</span>
+                  <span class="detail-value">${item.selectedSubject || '미지정'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">유형:</span>
+                  <span class="detail-value">${item.selectedType || '미지정'}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">데이터:</span>
+                  <span class="detail-value">${item.source === 'blog' ? '블로그' : '뉴스'}</span>
+                </div>
+                ${item.postDate ? `
+                  <div class="detail-row">
+                    <span class="detail-label">날짜:</span>
+                    <span class="detail-value">${item.postDate}</span>
+                  </div>
+                ` : ''}
+              </div>
+              ${item.classificationReason ? `
+                <div class="reason-box">
+                  <div class="reason-title">분류 근거</div>
+                  <div class="reason-keywords">
+                    ${item.classificationReason.typeKeywords?.map(k => `<span class="reason-keyword">${k}</span>`).join('') || ''}
+                    ${item.classificationReason.problems?.map(p => `<span class="problem-tag">극복: ${p}</span>`).join('') || ''}
+                  </div>
+                </div>
+              ` : ''}
+              ${item.link ? `<a href="${item.link}" target="_blank" class="case-link" onclick="event.stopPropagation()">원문 보기</a>` : ''}
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
           </div>
-        </div>
-      `;
-    }
-
-    // 날짜별 그룹핑
-    function groupByDate(items) {
-      const grouped = {};
-      items.forEach((item, index) => {
-        item.originalIndex = index;
-        const timestamp = item.decidedAt?.toMillis ? item.decidedAt.toMillis() : new Date(item.decidedAt || Date.now()).getTime();
-        const date = new Date(timestamp).toISOString().split('T')[0];
-        if (!grouped[date]) grouped[date] = [];
-        grouped[date].push(item);
-      });
-      return grouped;
-    }
-
-    // 날짜 포맷
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      if (dateStr === today.toISOString().split('T')[0]) return '오늘';
-      if (dateStr === yesterday.toISOString().split('T')[0]) return '어제';
-      
-      return `${date.getMonth() + 1}월 ${date.getDate()}일`;
-    }
-
-    // 체크박스 토글
-    function toggleItem(type, index, checked) {
-      if (checked) {
-        selectedItems[type].add(index);
-      } else {
-        selectedItems[type].delete(index);
-      }
-      updateDeleteButton(type);
-    }
-
-    // 전체 선택
-    function toggleCheckAll(type) {
-      const checked = document.getElementById(type + 'CheckAll').checked;
-      selectedItems[type].clear();
-      
-      if (checked) {
-        const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
-        items.forEach((_, index) => selectedItems[type].add(index));
+        `;
       }
       
-      if (type === 'approved') {
-        renderApprovedItems(currentData.approvedItems || []);
-      } else {
-        renderRejectedItems(currentData.rejectedItems || []);
-      }
+      container.innerHTML = html;
     }
 
-    // 날짜 그룹 선택
-    function toggleDateGroup(type, date, checked) {
-      const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
-      items.forEach((item, index) => {
-        const timestamp = item.decidedAt?.toMillis ? item.decidedAt.toMillis() : new Date(item.decidedAt || Date.now()).getTime();
-        const itemDate = new Date(timestamp).toISOString().split('T')[0];
-        if (itemDate === date) {
-          if (checked) {
-            selectedItems[type].add(index);
-          } else {
-            selectedItems[type].delete(index);
-          }
-        }
-      });
+    function toggleCategory(category) {
+      const el = document.getElementById('cat-' + category);
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // 검색
+    function searchCases() {
+      const subject = document.getElementById('searchSubject').value;
+      const type = document.getElementById('searchType').value;
+      const content = document.getElementById('searchContent').value.toLowerCase();
       
-      if (type === 'approved') {
-        renderApprovedItems(currentData.approvedItems || []);
-      } else {
-        renderRejectedItems(currentData.rejectedItems || []);
-      }
-    }
-
-    // 삭제 버튼 업데이트
-    function updateDeleteButton(type) {
-      const btn = document.getElementById(type + 'DeleteBtn');
-      if (selectedItems[type].size > 0) {
-        btn.classList.add('visible');
-        btn.textContent = `🗑️ ${selectedItems[type].size}개 삭제`;
-      } else {
-        btn.classList.remove('visible');
-      }
-    }
-
-    // 선택 삭제
-    async function deleteSelected(type) {
-      if (selectedItems[type].size === 0) return;
+      let results = currentData.approvedItems || [];
       
-      if (!confirm(`${selectedItems[type].size}개 항목을 삭제하시겠습니까?`)) return;
+      if (subject) {
+        results = results.filter(item => item.selectedSubject === subject);
+      }
+      
+      if (type) {
+        results = results.filter(item => item.selectedType === type);
+      }
+      
+      if (content) {
+        results = results.filter(item => {
+          const searchText = ((item.title || '') + ' ' + (item.content || '')).toLowerCase();
+          return searchText.includes(content);
+        });
+      }
+      
+      renderApprovedItems(results);
+    }
+
+    // 주체 선택
+    let selectedSubjectIndex = null;
+    async function selectSubject(itemIndex, optionIndex) {
+      selectedSubjectIndex = optionIndex;
+      // 주체 선택 시 시각적 피드백
+      alert('주체 선택됨. 이제 유형을 선택하세요.');
+    }
+
+    // 유형 선택 (승인)
+    async function selectType(itemIndex, optionIndex) {
+      if (selectedSubjectIndex === null) {
+        alert('먼저 주체를 선택하세요.');
+        return;
+      }
       
       const userDocRef = db.collection('users').doc(currentUser.uid);
-      const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
+      const item = currentData.approvalQueue[itemIndex];
       
-      // 선택되지 않은 항목만 유지
-      const newItems = items.filter((_, index) => !selectedItems[type].has(index));
+      const selectedSubject = item.subjectOptions[selectedSubjectIndex];
+      const selectedType = item.typeOptions[optionIndex];
       
-      const field = type === 'approved' ? 'approvedItems' : 'rejectedItems';
+      const newQueue = [...currentData.approvalQueue];
+      newQueue.splice(itemIndex, 1);
+      
+      const approvedItem = {
+        ...item,
+        selectedSubject: selectedSubject.label,
+        selectedType: selectedType.type,
+        primaryCategory: item.primaryCategories[0]?.label || '기타',
+        classificationReason: {
+          primaryKeywords: item.primaryCategories[0]?.keywords || [],
+          subjectKeywords: selectedSubject.keywords || [],
+          typeKeywords: selectedType.keywords || [],
+          problems: selectedType.problems || [],
+          confidence: selectedType.confidence
+        },
+        decidedAt: new Date().toISOString()
+      };
+      
+      const approvedItems = [approvedItem, ...(currentData.approvedItems || [])];
+      
       await userDocRef.update({
-        [field]: newItems,
-        [`stats.${type}`]: newItems.length
+        approvalQueue: newQueue,
+        approvedItems,
+        'stats.pending': newQueue.length,
+        'stats.approved': approvedItems.length
       });
       
-      selectedItems[type].clear();
-      document.getElementById(type + 'CheckAll').checked = false;
+      selectedSubjectIndex = null;
+    }
+
+    // 반려
+    async function rejectItem(index) {
+      const reason = prompt('반려 이유:\n1. 행위주체 모호\n2. 유형 모호\n3. 관련성 부족\n\n숫자를 입력하세요:');
+      
+      if (!reason) return;
+      
+      const reasons = ['', '행위주체 모호', '유형 모호', '관련성 부족'];
+      const reasonText = reasons[parseInt(reason)] || '기타';
+      
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const item = currentData.approvalQueue[index];
+      
+      const newQueue = [...currentData.approvalQueue];
+      newQueue.splice(index, 1);
+      
+      const rejectedItem = {
+        ...item,
+        rejectionReason: reasonText,
+        decidedAt: new Date().toISOString()
+      };
+      
+      const rejectedItems = [rejectedItem, ...(currentData.rejectedItems || [])];
+      
+      await userDocRef.update({
+        approvalQueue: newQueue,
+        rejectedItems,
+        'stats.pending': newQueue.length,
+        'stats.rejected': rejectedItems.length
+      });
+    }
+
+    // 키워드 제안 처리
+    async function handleKeywordCategory(index, level) {
+      // 일단 저장만 (나중에 구현)
+      alert(`키워드 카테고리: ${level} 선택됨`);
+    }
+
+    async function handleKeywordSearch(index, action) {
+      const userDocRef = db.collection('users').doc(currentUser.uid);
+      const item = currentData.approvalQueue[index];
+      
+      const newQueue = [...currentData.approvalQueue];
+      newQueue.splice(index, 1);
+      
+      // 검색 키워드로 사용할지 여부 저장
+      // TODO: 실제 키워드 목록에 추가하는 로직
+      
+      await userDocRef.update({
+        approvalQueue: newQueue,
+        'stats.pending': newQueue.length
+      });
     }
 
     // 상세보기 모달
     function showDetail(type, index) {
-      const items = type === 'approved' ? currentData.approvedItems : 
-                    type === 'rejected' ? currentData.rejectedItems :
-                    currentData.approvalQueue;
+      const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
       const item = items[index];
       
-      currentModalItem = item;
-      currentModalType = type;
+      document.getElementById('modalTitle').textContent = item.title;
       
-      document.getElementById('modalTitle').textContent = item.title || item.content;
+      let bodyHtml = `
+        <div class="modal-section">
+          <div class="modal-label">주체</div>
+          <div class="modal-text">${item.selectedSubject || '미지정'}</div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-label">유형</div>
+          <div class="modal-text">${item.selectedType || '미지정'}</div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-label">데이터 유형</div>
+          <div class="modal-text">${item.source === 'blog' ? '블로그' : '뉴스'}</div>
+        </div>
+      `;
       
-      // 상태
-      if (type === 'approved') {
-        document.getElementById('modalStatus').innerHTML = `
-          <span class="modal-status approved">✅ 승인함</span>
-        `;
-      } else if (type === 'rejected') {
-        document.getElementById('modalStatus').innerHTML = `
-          <span class="modal-status rejected">❌ 거절함</span>
-        `;
-      } else {
-        document.getElementById('modalStatus').innerHTML = `
-          <span class="modal-status" style="background: #fef3c7; color: #f59e0b;">⏳ 결정 대기</span>
+      if (item.postDate) {
+        bodyHtml += `
+          <div class="modal-section">
+            <div class="modal-label">게시 날짜</div>
+            <div class="modal-text">${item.postDate}</div>
+          </div>
         `;
       }
       
-      // 메타
-      let metaHtml = '<div class="item-meta">';
-      if (item.source) metaHtml += `<span class="meta-tag">${item.source === 'blog' ? '📝 블로그' : '📰 뉴스'}</span>`;
-      if (item.keyword) metaHtml += `<span class="meta-tag">키워드: ${item.keyword}</span>`;
-      if (item.priority) metaHtml += `<span class="meta-tag">${item.priority === 'primary' ? '1차 키워드' : '2차 키워드'}</span>`;
-      if (item.selectedType) metaHtml += `<span class="meta-tag">유형: ${item.selectedType}</span>`;
-      if (item.frequency) metaHtml += `<span class="meta-tag">빈도: ${item.frequency}회</span>`;
-      metaHtml += '</div>';
-      document.getElementById('modalMeta').innerHTML = metaHtml;
-      
-      // 설명
-      if (item.description) {
-        document.getElementById('modalDescSection').style.display = 'block';
-        document.getElementById('modalDescription').textContent = item.description;
-      } else {
-        document.getElementById('modalDescSection').style.display = 'none';
+      if (item.content) {
+        bodyHtml += `
+          <div class="modal-section">
+            <div class="modal-label">내용</div>
+            <div class="modal-text">${item.content}</div>
+          </div>
+        `;
       }
       
-      // 링크
+      if (item.classificationReason) {
+        bodyHtml += `
+          <div class="modal-section">
+            <div class="modal-label">분류 근거</div>
+            <div class="reason-box">
+              <div class="reason-content">
+                유형 키워드: ${item.classificationReason.typeKeywords?.join(', ') || '없음'}<br>
+                주체 키워드: ${item.classificationReason.subjectKeywords?.join(', ') || '없음'}<br>
+                신뢰도: ${item.classificationReason.confidence || 0}%
+                ${item.classificationReason.problems?.length > 0 ? `<br>극복한 문제: ${item.classificationReason.problems.join(', ')}` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
       if (item.link) {
-        document.getElementById('modalLinkSection').style.display = 'block';
-        const linkEl = document.getElementById('modalLink');
-        linkEl.href = item.link;
-        linkEl.textContent = item.link;
-      } else {
-        document.getElementById('modalLinkSection').style.display = 'none';
+        bodyHtml += `
+          <div class="modal-section">
+            <div class="modal-label">원문 링크</div>
+            <a href="${item.link}" target="_blank" class="modal-link">${item.link}</a>
+          </div>
+        `;
       }
       
-      // 푸터 버튼
-      let footerHtml = '';
-      if (type === 'approved') {
-        footerHtml = `
-          <button class="modal-btn modal-btn-primary" onclick="reconsiderItem('approved', ${index})">
-            🔄 다시 검토
-          </button>
-          <button class="modal-btn modal-btn-secondary" onclick="changeDecision(${index}, 'rejected')">
-            ↔️ 거절로 변경
-          </button>
-          <button class="modal-btn modal-btn-danger" onclick="deleteSingleItem('approved', ${index})">
-            🗑️ 삭제
-          </button>
-          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">
-            닫기
-          </button>
-        `;
-     } else if (type === 'rejected') {
-        footerHtml = `
-          <button class="modal-btn modal-btn-primary" onclick="reconsiderItem('rejected', ${index})">
-            🔄 다시 검토
-          </button>
-          <button class="modal-btn modal-btn-secondary" onclick="changeDecision(${index}, 'approved')">
-            ↔️ 승인으로 변경
-          </button>
-          <button class="modal-btn modal-btn-danger" onclick="deleteSingleItem('rejected', ${index})">
-            🗑️ 삭제
-          </button>
-          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">
-            닫기
-          </button>
-        `;
-      } else {
-        footerHtml = `
-          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">
-            닫기
-          </button>
-        `;
-      }
+      document.getElementById('modalBody').innerHTML = bodyHtml;
+      
+      let footerHtml = `
+        <button class="modal-btn modal-btn-primary" onclick="reconsider('${type}', ${index})">
+          다시 검토
+        </button>
+        <button class="modal-btn modal-btn-secondary" onclick="closeModal()">
+          닫기
+        </button>
+      `;
       
       document.getElementById('modalFooter').innerHTML = footerHtml;
-      
       document.getElementById('detailModal').classList.add('active');
+    }
+
+    function showCategoryDetail(category, index) {
+      const items = currentData.approvedItems.filter(i => (i.primaryCategory || '미분류') === category);
+      showDetail('approved', currentData.approvedItems.indexOf(items[index]));
     }
 
     function closeModal() {
       document.getElementById('detailModal').classList.remove('active');
     }
 
-    // 결정 변경
-    async function changeDecision(index, newType) {
-      const oldType = currentModalType;
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      
-      const oldItems = oldType === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
-      const newItems = newType === 'approved' ? currentData.approvedItems || [] : currentData.rejectedItems || [];
-      
-      const item = oldItems[index];
-      
-      // 기존 배열에서 제거
-      const updatedOldItems = [...oldItems];
-      updatedOldItems.splice(index, 1);
-      
-      // 새 배열에 추가
-      const updatedNewItems = [{
-        ...item,
-        decision: newType,
-        decidedAt: firebase.firestore.Timestamp.now()
-      }, ...newItems];
-      
-      await userDocRef.update({
-        [oldType === 'approved' ? 'approvedItems' : 'rejectedItems']: updatedOldItems,
-        [newType === 'approved' ? 'approvedItems' : 'rejectedItems']: updatedNewItems,
-        [`stats.${oldType}`]: updatedOldItems.length,
-        [`stats.${newType}`]: updatedNewItems.length
-      });
-      
-      closeModal();
-    }
-
-// 재검토 (approved/rejected → approvalQueue)
-    async function reconsiderItem(type, index) {
+    // 재검토
+    async function reconsider(type, index) {
       const userDocRef = db.collection('users').doc(currentUser.uid);
       
       const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
       const item = items[index];
       
-      // decision, decidedAt, selectedType 제거하고 원래 형태로
-      const { decision, decidedAt, selectedType, selectedOption, ...originalItem } = item;
+      const { decidedAt, selectedSubject, selectedType, primaryCategory, secondaryCategory, classificationReason, rejectionReason, ...originalItem } = item;
       
-      // 옵션 재구성
-      if (!originalItem.options && originalItem.category) {
-        // 기존에 승인/거절했던 항목이면 기본 옵션 추가
-        originalItem.options = [
-          { label: '무임승차형', percentage: 85 },
-          { label: '협력형', percentage: 70 }
-        ];
-        originalItem.type = 'classification';
-        originalItem.title = '재검토: 유형 결정';
-      }
+      // approvalQueue로 이동
+      const newQueue = [originalItem, ...(currentData.approvalQueue || [])];
       
-      // 기존 배열에서 제거
       const updatedItems = [...items];
       updatedItems.splice(index, 1);
-      
-      // approvalQueue에 추가
-      const newQueue = [originalItem, ...(currentData.approvalQueue || [])];
       
       await userDocRef.update({
         [type === 'approved' ? 'approvedItems' : 'rejectedItems']: updatedItems,
@@ -1488,155 +1546,6 @@
       
       closeModal();
     }
-    
-    // 개별 삭제
-    async function deleteSingleItem(type, index) {
-      if (!confirm('이 항목을 삭제하시겠습니까?')) return;
-      
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      const items = type === 'approved' ? currentData.approvedItems : currentData.rejectedItems;
-      
-      const newItems = [...items];
-      newItems.splice(index, 1);
-      
-      await userDocRef.update({
-        [type === 'approved' ? 'approvedItems' : 'rejectedItems']: newItems,
-        [`stats.${type}`]: newItems.length
-      });
-      
-      closeModal();
-    }
-
-    // 분류 승인
-    async function handleClassification(index, selectedType) {
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      
-      const item = currentData.approvalQueue[index];
-      const newQueue = [...currentData.approvalQueue];
-      newQueue.splice(index, 1);
-      
-      const approvedItems = [{
-        ...item,
-        decision: 'approved',
-        selectedType,
-        decidedAt: firebase.firestore.Timestamp.now()
-      }, ...(currentData.approvedItems || [])];
-      
-      await userDocRef.update({
-        approvalQueue: newQueue,
-        approvedItems,
-        'stats.pending': newQueue.length,
-        'stats.approved': approvedItems.length
-      });
-    }
-
-    // 키워드 승인
-    async function handleKeywordDecision(index, selectedOption) {
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      
-      const item = currentData.approvalQueue[index];
-      const newQueue = [...currentData.approvalQueue];
-      newQueue.splice(index, 1);
-      
-      const decision = selectedOption === 'exclude' ? 'rejected' : 'approved';
-      
-      if (decision === 'approved') {
-        const approvedItems = [{
-          ...item,
-          decision,
-          selectedOption,
-          decidedAt: firebase.firestore.Timestamp.now()
-        }, ...(currentData.approvedItems || [])];
-        
-        await userDocRef.update({
-          approvalQueue: newQueue,
-          approvedItems,
-          'stats.pending': newQueue.length,
-          'stats.approved': approvedItems.length
-        });
-      } else {
-        const rejectedItems = [{
-          ...item,
-          decision,
-          selectedOption,
-          decidedAt: firebase.firestore.Timestamp.now()
-        }, ...(currentData.rejectedItems || [])];
-        
-        await userDocRef.update({
-          approvalQueue: newQueue,
-          rejectedItems,
-          'stats.pending': newQueue.length,
-          'stats.rejected': rejectedItems.length
-        });
-      }
-    }
-
-    // 거절
-    async function handleReject(index) {
-      const userDocRef = db.collection('users').doc(currentUser.uid);
-      
-      const item = currentData.approvalQueue[index];
-      const newQueue = [...currentData.approvalQueue];
-      newQueue.splice(index, 1);
-      
-      const rejectedItems = [{
-        ...item,
-        decision: 'rejected',
-        decidedAt: firebase.firestore.Timestamp.now()
-      }, ...(currentData.rejectedItems || [])];
-      
-      await userDocRef.update({
-        approvalQueue: newQueue,
-        rejectedItems,
-        'stats.pending': newQueue.length,
-        'stats.rejected': rejectedItems.length
-      });
-    }
-
-    // 알림 권한 확인
-    function checkNotificationPermission() {
-      if (!('Notification' in window)) return;
-      
-      if (Notification.permission === 'default') {
-        document.getElementById('notificationBanner').classList.remove('hidden');
-      } else if (Notification.permission === 'granted') {
-        document.getElementById('notificationBanner').classList.add('hidden');
-      }
-    }
-
-    // 알림 권한 요청
-    async function requestNotificationPermission() {
-      if (!('Notification' in window)) {
-        alert('이 브라우저는 알림을 지원하지 않습니다.');
-        return;
-      }
-      
-      const permission = await Notification.requestPermission();
-      
-      if (permission === 'granted') {
-        document.getElementById('notificationBanner').classList.add('hidden');
-        new Notification('알림 설정 완료!', {
-          body: '새로운 결정 항목이 생기면 알림을 받습니다.',
-          icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzYzNjZmMSIvPjwvc3ZnPg=='
-        });
-      }
-    }
-
-    // 새 항목 알림
-    function checkForNewPending(queue) {
-      const currentCount = queue.length;
-      
-      if (lastPendingCount > 0 && currentCount > lastPendingCount && Notification.permission === 'granted') {
-        const diff = currentCount - lastPendingCount;
-        new Notification('새로운 결정이 필요합니다!', {
-          body: `${diff}개의 새로운 항목이 대기중입니다.`,
-          icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iIzYzNjZmMSIvPjwvc3ZnPg==',
-          tag: 'new-pending'
-        });
-      }
-      
-      lastPendingCount = currentCount;
-    }
 
     // 모달 외부 클릭 시 닫기
     document.getElementById('detailModal').addEventListener('click', (e) => {
@@ -1644,12 +1553,6 @@
         closeModal();
       }
     });
-
-    // PWA 서비스 워커
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('data:text/javascript;base64,')
-        .catch(err => console.log('SW registration failed'));
-    }
   </script>
 </body>
 </html>
