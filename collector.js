@@ -28,7 +28,7 @@ const SECONDARY_KEYWORDS = [
   '단체', '연합', '연대', '총회', '노조', '회의', '소통', '의사결정', '책임전가'
 ];
 
-// 제외할 일반 단어 (너무 흔함)
+// 제외할 일반 단어
 const EXCLUDED_WORDS = [
   '사람', '학생', '회사', '일', '오늘', '내일', '어제', '시간', '정말', '진짜',
   '이것', '그것', '저것', '여기', '거기', '저기', '이번', '다음', '지난',
@@ -154,10 +154,24 @@ function analyzeType(title, description) {
   return types.length > 0 ? types : [{ type: '일반', confidence: 50 }];
 }
 
-async function searchNaverBlog(keyword, display = 10) {
+// 🔥 최적화된 블로그 검색 (display 100, 랜덤 start, 랜덤 정렬)
+async function searchNaverBlog(keyword) {
   try {
+    // 랜덤 start (1, 101, 201, 301, 401, 501, 601, 701, 801, 901 중 하나)
+    const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
+    
+    // 랜덤 정렬 (date 또는 sim)
+    const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
+    
+    console.log(`   → start: ${randomStart}, sort: ${randomSort}`);
+    
     const response = await axios.get('https://openapi.naver.com/v1/search/blog.json', {
-      params: { query: keyword, display, sort: 'date' },
+      params: { 
+        query: keyword, 
+        display: 100,  // 최대치
+        start: randomStart,
+        sort: randomSort
+      },
       headers: { 
         'X-Naver-Client-Id': NAVER_CLIENT_ID,
         'X-Naver-Client-Secret': NAVER_CLIENT_SECRET 
@@ -170,10 +184,24 @@ async function searchNaverBlog(keyword, display = 10) {
   }
 }
 
-async function searchNaverNews(keyword, display = 5) {
+// 🔥 최적화된 뉴스 검색 (display 100, 랜덤 start, 랜덤 정렬)
+async function searchNaverNews(keyword) {
   try {
+    // 랜덤 start (1, 101, 201, 301, 401, 501, 601, 701, 801, 901 중 하나)
+    const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
+    
+    // 랜덤 정렬 (date 또는 sim)
+    const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
+    
+    console.log(`   → start: ${randomStart}, sort: ${randomSort}`);
+    
     const response = await axios.get('https://openapi.naver.com/v1/search/news.json', {
-      params: { query: keyword, display, sort: 'date' },
+      params: { 
+        query: keyword, 
+        display: 100,  // 최대치
+        start: randomStart,
+        sort: randomSort
+      },
       headers: { 
         'X-Naver-Client-Id': NAVER_CLIENT_ID,
         'X-Naver-Client-Secret': NAVER_CLIENT_SECRET 
@@ -204,8 +232,8 @@ async function collectContent() {
   for (const keyword of PRIMARY_KEYWORDS) {
     if (primaryBlogCount >= 55) break;
     
-    console.log(`🔍 [1차] ${keyword}`);
-    const items = await searchNaverBlog(keyword, 10);
+    console.log(`🔍 [1차 블로그] ${keyword}`);
+    const items = await searchNaverBlog(keyword);
     
     for (const item of items) {
       if (primaryBlogCount >= 55) break;
@@ -240,8 +268,8 @@ async function collectContent() {
   for (const keyword of SECONDARY_KEYWORDS) {
     if (secondaryBlogCount >= 25) break;
     
-    console.log(`🔍 [2차] ${keyword}`);
-    const items = await searchNaverBlog(keyword, 8);
+    console.log(`🔍 [2차 블로그] ${keyword}`);
+    const items = await searchNaverBlog(keyword);
     
     for (const item of items) {
       if (secondaryBlogCount >= 25) break;
@@ -278,8 +306,8 @@ async function collectContent() {
   for (const keyword of PRIMARY_KEYWORDS) {
     if (primaryNewsCount >= 15) break;
     
-    console.log(`📰 [1차] ${keyword}`);
-    const items = await searchNaverNews(keyword, 4);
+    console.log(`📰 [1차 뉴스] ${keyword}`);
+    const items = await searchNaverNews(keyword);
     
     for (const item of items) {
       if (primaryNewsCount >= 15) break;
@@ -314,8 +342,8 @@ async function collectContent() {
   for (const keyword of SECONDARY_KEYWORDS) {
     if (secondaryNewsCount >= 5) break;
     
-    console.log(`📰 [2차] ${keyword}`);
-    const items = await searchNaverNews(keyword, 2);
+    console.log(`📰 [2차 뉴스] ${keyword}`);
+    const items = await searchNaverNews(keyword);
     
     for (const item of items) {
       if (secondaryNewsCount >= 5) break;
@@ -469,133 +497,13 @@ async function saveToUserDB(items) {
   
   console.log('✅ 저장 완료!');
 }
-```
-
----
-
-## ✨ 수정 내용
-
-### 추가된 기능:
-1. **자동 승인 항목 처리**
-   - 유형이 1개만 있으면 자동으로 approvedItems에 저장
-   - 유형이 2개 이상이면 approvalQueue로 (사용자 결정 필요)
-
-2. **approvedItems, rejectedItems 지원**
-   - 빈 배열로 초기화
-   - 자동 승인된 것 바로 저장
-
-3. **통계 정확도 향상**
-   - 자동 승인된 개수 즉시 반영
-
----
-
-## 🎯 이제 동작 방식
-```
-수집 100개
-    ↓
-유형 1개 (70개) → approvedItems (자동 승인) ✅
-유형 2개 이상 (30개) → approvalQueue (사용자 결정 필요) ⏳
-    ↓
-사용자 승인 → approvedItems ✅
-사용자 거절 → rejectedItems ❌
-  console.log('💾 데이터 저장 중...');
-  
-  const usersSnapshot = await db.collection('users').get();
-  if (usersSnapshot.empty) {
-    console.log('⚠️ 사용자 없음');
-    return;
-  }
-  
-  // 키워드 제안 생성
-  const keywordSuggestions = generateKeywordSuggestions();
-  
-  if (keywordSuggestions.length > 0) {
-    console.log('');
-    console.log('🔑 새 키워드 제안:');
-    keywordSuggestions.forEach(s => {
-      console.log(`   - "${s.keyword}" (${s.frequency}회 발견)`);
-    });
-  }
-  
-  for (const userDoc of usersSnapshot.docs) {
-    const userData = userDoc.data();
-    
-    // 모호한 분류 항목
-    const classificationApprovals = items
-      .filter(item => item.types.length > 1)
-      .map((item, index) => ({
-        id: Date.now() + index,
-        type: 'classification',
-        title: '모호한 분류: 유형 결정',
-        content: item.title,
-        description: item.description.substring(0, 150) + '...',
-        link: item.link,
-        source: item.source,
-        keyword: item.keyword,
-        priority: item.priority,
-        options: item.types.map(t => ({ label: t.type, percentage: t.confidence }))
-      }));
-    
-    // 키워드 제안 항목
-    const keywordApprovals = keywordSuggestions.map((suggestion, index) => ({
-      id: Date.now() + 1000000 + index,
-      type: 'keyword',
-      title: '새 키워드 제안',
-      content: `"${suggestion.keyword}" 키워드를 추가하시겠습니까?`,
-      description: `이번 수집에서 ${suggestion.frequency}회 발견되었습니다.`,
-      keyword: suggestion.keyword,
-      frequency: suggestion.frequency,
-      options: [
-        { label: '1차 키워드로 추가', value: 'primary' },
-        { label: '2차 키워드로 추가', value: 'secondary' },
-        { label: '제외', value: 'exclude' }
-      ]
-    }));
-    
-    const allApprovals = [...classificationApprovals, ...keywordApprovals];
-    const autoApproved = items.filter(item => item.types.length === 1);
-    const currentStats = userData.stats || { total: 0, pending: 0, approved: 0, rejected: 0 };
-    
-    const blogCount = items.filter(i => i.source === 'blog').length;
-    const newsCount = items.filter(i => i.source === 'news').length;
-    const primaryCount = items.filter(i => i.priority === 'primary').length;
-    const secondaryCount = items.filter(i => i.priority === 'secondary').length;
-    
-    await db.collection('users').doc(userDoc.id).update({
-      stats: {
-        total: currentStats.total + items.length,
-        pending: currentStats.pending + allApprovals.length,
-        approved: currentStats.approved + autoApproved.length,
-        rejected: currentStats.rejected || 0
-      },
-      approvalQueue: [...(userData.approvalQueue || []), ...allApprovals],
-      activities: [{
-        time: '방금',
-        action: '수집',
-        content: `${items.length}개 수집 (블로그 ${blogCount}, 뉴스 ${newsCount}) [1차: ${primaryCount}, 2차: ${secondaryCount}]${keywordSuggestions.length > 0 ? ` + 키워드 ${keywordSuggestions.length}개 제안` : ''}`
-      }, ...(userData.activities || [])].slice(0, 20),
-      lastCollection: new Date().toISOString()
-    });
-    
-    console.log(`✅ 사용자 ${userDoc.id} 업데이트 완료`);
-  }
-  
-  // collected 컬렉션에 저장
-  for (const item of items) {
-    await db.collection('collected').add({ 
-      ...item, 
-      collectedAt: new Date().toISOString() 
-    });
-  }
-  
-  console.log('✅ 저장 완료!');
-}
 
 async function main() {
   try {
     console.log('');
     console.log('═══════════════════════════════════════');
-    console.log('🎓 Learning Dashboard Collector v2.0');
+    console.log('🎓 Learning Dashboard Collector v3.0');
+    console.log('🚀 최적화: display 100 + 랜덤 start + 랜덤 정렬');
     console.log('═══════════════════════════════════════');
     console.log(`시작: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`);
     console.log('');
@@ -618,30 +526,3 @@ async function main() {
 }
 
 main();
-```
-
----
-
-## ✨ 새로운 기능
-
-### 1. 확장된 키워드
-```
-1차: 공모전, 팀플, 대회, 세미나, 콜라보, 워크샵, 해커톤, 동아리, 학회 등
-2차: 무임승차, 갈등, 단체, 연합, 노조, 회의, 소통, 의사결정 등
-```
-
-### 2. 자동 키워드 제안 🆕
-```
-[새 키워드 제안] "스타트업" (15회 발견)
-→ 1차 키워드로 추가
-→ 2차 키워드로 추가
-→ 제외
-```
-
-### 3. 향상된 카테고리
-```
-- 공모전/대회
-- 학습 (세미나/워크샵)
-- 조직 (동아리/단체)
-- 협업 (프로젝트)
-- 팀플 (여러 유형)
