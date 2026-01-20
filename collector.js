@@ -85,82 +85,433 @@ function generateKeywordSuggestions() {
   return suggestions.slice(0, 5); // 상위 5개만
 }
 
-function categorizeContent(title, description) {
+// 1차 카테고리 분석 (주제 12개)
+function analyzePrimaryCategory(title, description) {
   const text = (title + ' ' + description).toLowerCase();
+  const categories = [];
   
-  // 공모전/대회
-  if (text.includes('공모전') || text.includes('대회') || text.includes('해커톤')) {
-    return { main: '공모전/대회', sub: '팀 프로젝트' };
-  }
-  
-  // 세미나/워크샵
-  if (text.includes('세미나') || text.includes('워크샵') || text.includes('학회')) {
-    return { main: '학습', sub: '세미나/워크샵' };
-  }
-  
-  // 동아리/단체
-  if (text.includes('동아리') || text.includes('단체') || text.includes('연합')) {
-    return { main: '조직', sub: '동아리/단체' };
+  // 정치
+  const politicsKeywords = ['정치', '국회', '의원', '선거', '법안', '정당', '정부', '대통령'];
+  if (politicsKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '정치', 
+      confidence: 90,
+      keywords: politicsKeywords.filter(k => text.includes(k))
+    });
   }
   
-  // 협업 프로젝트
-  if (text.includes('콜라보') || text.includes('컬래버') || text.includes('협업')) {
-    return { main: '협업', sub: '프로젝트' };
+  // 사회
+  const societyKeywords = ['사회', '복지', '시민', '주민', '지역', '공동체'];
+  if (societyKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '사회', 
+      confidence: 85,
+      keywords: societyKeywords.filter(k => text.includes(k))
+    });
   }
   
-  // 팀플 유형 세분화
-  if (text.includes('무임승차') || text.includes('프리라이더')) {
-    return { main: '팀플', sub: '무임승차형' };
-  }
-  if (text.includes('조장') || text.includes('리더')) {
-    return { main: '팀플', sub: '주도형' };
-  }
-  if (text.includes('역할분담') || text.includes('계획')) {
-    return { main: '팀플', sub: '플래너형' };
-  }
-  if (text.includes('갈등') || text.includes('싸움') || text.includes('의견충돌')) {
-    return { main: '팀플', sub: '갈등형' };
-  }
-  if (text.includes('소통') || text.includes('회의') || text.includes('의사결정')) {
-    return { main: '팀플', sub: '소통형' };
+  // 경제
+  const economyKeywords = ['경제', '금융', '무역', '투자', '기업', '산업', '노동', '일자리'];
+  if (economyKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '경제', 
+      confidence: 85,
+      keywords: economyKeywords.filter(k => text.includes(k))
+    });
   }
   
-  return { main: '팀플', sub: '일반' };
+  // 과학
+  const scienceKeywords = ['과학', '연구', '실험', '논문', '발견', '이론'];
+  if (scienceKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '과학', 
+      confidence: 85,
+      keywords: scienceKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 공학
+  const engineeringKeywords = ['공학', '엔지니어', '설계', '제작', '기술개발'];
+  if (engineeringKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '공학', 
+      confidence: 85,
+      keywords: engineeringKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 의료
+  const medicalKeywords = ['의료', '병원', '의사', '환자', '치료', '건강', '질병'];
+  if (medicalKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '의료', 
+      confidence: 85,
+      keywords: medicalKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 교육
+  const educationKeywords = ['교육', '학교', '대학', '학생', '교수', '수업', '강의', '팀플', '조별과제'];
+  if (educationKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '교육', 
+      confidence: 85,
+      keywords: educationKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 문화
+  const cultureKeywords = ['문화', '예술', '음악', '영화', '공연', '전시', '축제'];
+  if (cultureKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '문화', 
+      confidence: 85,
+      keywords: cultureKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 스포츠
+  const sportsKeywords = ['스포츠', '경기', '선수', '팀', '대회', '올림픽', '월드컵'];
+  if (sportsKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '스포츠', 
+      confidence: 85,
+      keywords: sportsKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 환경
+  const environmentKeywords = ['환경', '기후', '탄소', '에너지', '오염', '재생'];
+  if (environmentKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '환경', 
+      confidence: 85,
+      keywords: environmentKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 기술
+  const techKeywords = ['기술', 'IT', '소프트웨어', '앱', '프로그램', '코딩', '개발', '프로젝트'];
+  if (techKeywords.some(k => text.includes(k))) {
+    categories.push({ 
+      label: '기술', 
+      confidence: 85,
+      keywords: techKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 기타 (아무것도 해당 안 되면)
+  if (categories.length === 0) {
+    categories.push({ 
+      label: '기타', 
+      confidence: 50,
+      keywords: []
+    });
+  }
+  
+  return categories;
 }
 
-function analyzeType(title, description) {
+// 행위 주체 분석
+function analyzeSubject(title, description) {
+  const text = (title + ' ' + description).toLowerCase();
+  const subjects = [];
+  
+  // 학생
+  const studentKeywords = ['학생', '대학', '팀플', '조별과제', '학회'];
+  if (studentKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '학생', 
+      confidence: 85,
+      keywords: studentKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 직장인
+  const workerKeywords = ['회사', '직장', '프로젝트', '업무', '팀원', '부서'];
+  if (workerKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '직장인', 
+      confidence: 80,
+      keywords: workerKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 정치인
+  const politicianKeywords = ['국회', '의원', '정당', '법안', '정치'];
+  if (politicianKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '정치인', 
+      confidence: 90,
+      keywords: politicianKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 블로거/크리에이터
+  const creatorKeywords = ['블로그', '유튜브', '콘텐츠', '인플루언서', '크리에이터'];
+  if (creatorKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '크리에이터', 
+      confidence: 85,
+      keywords: creatorKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 활동가
+  const activistKeywords = ['시민단체', '활동가', '운동', '캠페인', '연대'];
+  if (activistKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '활동가', 
+      confidence: 80,
+      keywords: activistKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 기업/단체
+  const organizationKeywords = ['기업', '조직', '협회', '단체'];
+  if (organizationKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '기업/단체', 
+      confidence: 75,
+      keywords: organizationKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  // 개발자
+  const developerKeywords = ['개발', '코딩', '프로그래밍', '오픈소스', '깃허브'];
+  if (developerKeywords.some(k => text.includes(k))) {
+    subjects.push({ 
+      label: '개발자', 
+      confidence: 85,
+      keywords: developerKeywords.filter(k => text.includes(k))
+    });
+  }
+  
+  return subjects.length > 0 ? subjects : [{ label: '기타', confidence: 50, keywords: [] }];
+}
+
+// 긍정적 유형 분석 (16개)
+function analyzePositiveType(title, description) {
   const text = (title + ' ' + description).toLowerCase();
   const types = [];
   
-  if (text.includes('무임승차') || text.includes('안 함')) {
-    types.push({ type: '무임승차형', confidence: 85 });
-  }
-  if (text.includes('혼자') || text.includes('다 했')) {
-    types.push({ type: '과도헌신형', confidence: 80 });
-  }
-  if (text.includes('계획') || text.includes('플래너')) {
-    types.push({ type: '플래너형', confidence: 70 });
-  }
-  if (text.includes('갈등') || text.includes('의견충돌')) {
-    types.push({ type: '갈등형', confidence: 75 });
-  }
-  if (text.includes('리더') || text.includes('조장')) {
-    types.push({ type: '주도형', confidence: 80 });
-  }
-  if (text.includes('소통') || text.includes('협업')) {
-    types.push({ type: '협력형', confidence: 75 });
+  // 문제 상황 감지 (학습용)
+  const problems = [];
+  if (text.match(/무임승차|안 함|프리라이더/)) problems.push('무임승차');
+  if (text.match(/독단|독선|혼자 결정/)) problems.push('독단');
+  if (text.match(/갈등|싸움|의견충돌/)) problems.push('갈등');
+  
+  // === 리더십 계열 ===
+  
+  // 주도형
+  const leaderKeywords = ['앞장', '이끌', '주도', '리더', '책임지고'];
+  if (leaderKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '주도형',
+      category: '리더십',
+      confidence: 85,
+      keywords: leaderKeywords.filter(k => text.includes(k)),
+      problems
+    });
   }
   
-  return types.length > 0 ? types : [{ type: '일반', confidence: 50 }];
+  // 비전제시형
+  const visionKeywords = ['방향', '목표', '비전', '제시', '방향성'];
+  if (visionKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '비전제시형',
+      category: '리더십',
+      confidence: 80,
+      keywords: visionKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 전략가형
+  const strategyKeywords = ['계획', '전략', '플랜', '기획', '설계'];
+  if (strategyKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '전략가형',
+      category: '리더십',
+      confidence: 85,
+      keywords: strategyKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // === 실행 계열 ===
+  
+  // 실행형
+  const executionKeywords = ['실행', '행동', '바로', '즉시', '실천'];
+  if (executionKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '실행형',
+      category: '실행',
+      confidence: 85,
+      keywords: executionKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 완수형
+  const completionKeywords = ['완수', '끝까지', '마무리', '완성', '책임'];
+  if (completionKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '완수형',
+      category: '실행',
+      confidence: 80,
+      keywords: completionKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 속도형
+  const speedKeywords = ['빠르게', '신속', '효율', '빨리', '재빠르'];
+  if (speedKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '속도형',
+      category: '실행',
+      confidence: 75,
+      keywords: speedKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // === 협업 계열 ===
+  
+  // 협력형
+  const cooperationKeywords = ['협력', '함께', '같이', '협업', '공동'];
+  if (cooperationKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '협력형',
+      category: '협업',
+      confidence: 85,
+      keywords: cooperationKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 조율자형
+  const coordinatorKeywords = ['조율', '조정', '균형', '맞추'];
+  if (coordinatorKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '조율자형',
+      category: '협업',
+      confidence: 80,
+      keywords: coordinatorKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 지원형
+  const supportKeywords = ['지원', '돕', '서포트', '보조', '도움'];
+  if (supportKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '지원형',
+      category: '협업',
+      confidence: 80,
+      keywords: supportKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // === 소통 계열 ===
+  
+  // 소통형
+  const communicationKeywords = ['소통', '대화', '이야기', '얘기'];
+  if (communicationKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '소통형',
+      category: '소통',
+      confidence: 85,
+      keywords: communicationKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 경청형
+  const listeningKeywords = ['경청', '듣', '귀 기울', '들어줬'];
+  if (listeningKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '경청형',
+      category: '소통',
+      confidence: 80,
+      keywords: listeningKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 중재형
+  const mediationKeywords = ['중재', '해결', '풀어', '조정', '타협'];
+  if (mediationKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '중재형',
+      category: '소통',
+      confidence: 85,
+      keywords: mediationKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // === 혁신 계열 ===
+  
+  // 혁신형
+  const innovationKeywords = ['혁신', '새로운', '변화', '개선'];
+  if (innovationKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '혁신형',
+      category: '혁신',
+      confidence: 80,
+      keywords: innovationKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 창의형
+  const creativeKeywords = ['창의', '아이디어', '발상', '독창적'];
+  if (creativeKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '창의형',
+      category: '혁신',
+      confidence: 80,
+      keywords: creativeKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // 분석형
+  const analyticalKeywords = ['분석', '논리', '체계', '정리', '파악'];
+  if (analyticalKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '분석형',
+      category: '혁신',
+      confidence: 80,
+      keywords: analyticalKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  // === 안정 계열 ===
+  
+  // 신뢰구축형
+  const trustKeywords = ['신뢰', '믿음', '약속', '성실', '진실'];
+  if (trustKeywords.some(k => text.includes(k))) {
+    types.push({
+      type: '신뢰구축형',
+      category: '안정',
+      confidence: 80,
+      keywords: trustKeywords.filter(k => text.includes(k)),
+      problems
+    });
+  }
+  
+  return types.length > 0 ? types : [{ type: '일반', category: '기타', confidence: 50, keywords: [], problems }];
 }
 
-// 🔥 최적화된 블로그 검색 (display 100, 랜덤 start, 랜덤 정렬)
+// 최적화된 블로그 검색
 async function searchNaverBlog(keyword) {
   try {
-    // 랜덤 start (1, 101, 201, 301, 401, 501, 601, 701, 801, 901 중 하나)
     const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
-    
-    // 랜덤 정렬 (date 또는 sim)
     const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
     
     console.log(`   → start: ${randomStart}, sort: ${randomSort}`);
@@ -168,7 +519,7 @@ async function searchNaverBlog(keyword) {
     const response = await axios.get('https://openapi.naver.com/v1/search/blog.json', {
       params: { 
         query: keyword, 
-        display: 100,  // 최대치
+        display: 100,
         start: randomStart,
         sort: randomSort
       },
@@ -184,13 +535,10 @@ async function searchNaverBlog(keyword) {
   }
 }
 
-// 🔥 최적화된 뉴스 검색 (display 100, 랜덤 start, 랜덤 정렬)
+// 최적화된 뉴스 검색
 async function searchNaverNews(keyword) {
   try {
-    // 랜덤 start (1, 101, 201, 301, 401, 501, 601, 701, 801, 901 중 하나)
     const randomStart = Math.floor(Math.random() * 10) * 100 + 1;
-    
-    // 랜덤 정렬 (date 또는 sim)
     const randomSort = Math.random() > 0.5 ? 'date' : 'sim';
     
     console.log(`   → start: ${randomStart}, sort: ${randomSort}`);
@@ -198,7 +546,7 @@ async function searchNaverNews(keyword) {
     const response = await axios.get('https://openapi.naver.com/v1/search/news.json', {
       params: { 
         query: keyword, 
-        display: 100,  // 최대치
+        display: 100,
         start: randomStart,
         sort: randomSort
       },
@@ -222,12 +570,9 @@ async function collectContent() {
   let primaryNewsCount = 0;
   let secondaryNewsCount = 0;
   
-  // 빈도 카운터 초기화
   keywordFrequency.clear();
   
-  // === 블로그 수집 ===
-  
-  // 1차 키워드 블로그 (목표: 55개)
+  // 1차 키워드 블로그
   console.log('📌 1차 키워드 블로그 수집 (목표: 55개)');
   for (const keyword of PRIMARY_KEYWORDS) {
     if (primaryBlogCount >= 55) break;
@@ -242,8 +587,11 @@ async function collectContent() {
       const title = stripHtml(item.title);
       const description = stripHtml(item.description);
       
-      // 키워드 분석
       analyzeKeywords(title, description);
+      
+      const primaryCategories = analyzePrimaryCategory(title, description);
+      const subjects = analyzeSubject(title, description);
+      const types = analyzePositiveType(title, description);
       
       results.push({
         source: 'blog',
@@ -252,8 +600,10 @@ async function collectContent() {
         title,
         description,
         link: item.link,
-        category: categorizeContent(title, description),
-        types: analyzeType(title, description),
+        postDate: item.postdate,
+        primaryCategories,
+        subjects,
+        types,
         timestamp: new Date().toISOString()
       });
       
@@ -263,7 +613,7 @@ async function collectContent() {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // 2차 키워드 블로그 (목표: 25개)
+  // 2차 키워드 블로그
   console.log('📌 2차 키워드 블로그 수집 (목표: 25개)');
   for (const keyword of SECONDARY_KEYWORDS) {
     if (secondaryBlogCount >= 25) break;
@@ -278,8 +628,11 @@ async function collectContent() {
       const title = stripHtml(item.title);
       const description = stripHtml(item.description);
       
-      // 키워드 분석
       analyzeKeywords(title, description);
+      
+      const primaryCategories = analyzePrimaryCategory(title, description);
+      const subjects = analyzeSubject(title, description);
+      const types = analyzePositiveType(title, description);
       
       results.push({
         source: 'blog',
@@ -288,8 +641,10 @@ async function collectContent() {
         title,
         description,
         link: item.link,
-        category: categorizeContent(title, description),
-        types: analyzeType(title, description),
+        postDate: item.postdate,
+        primaryCategories,
+        subjects,
+        types,
         timestamp: new Date().toISOString()
       });
       
@@ -299,9 +654,7 @@ async function collectContent() {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // === 뉴스 수집 ===
-  
-  // 1차 키워드 뉴스 (목표: 15개)
+  // 1차 키워드 뉴스
   console.log('📌 1차 키워드 뉴스 수집 (목표: 15개)');
   for (const keyword of PRIMARY_KEYWORDS) {
     if (primaryNewsCount >= 15) break;
@@ -316,8 +669,11 @@ async function collectContent() {
       const title = stripHtml(item.title);
       const description = stripHtml(item.description);
       
-      // 키워드 분석
       analyzeKeywords(title, description);
+      
+      const primaryCategories = analyzePrimaryCategory(title, description);
+      const subjects = analyzeSubject(title, description);
+      const types = analyzePositiveType(title, description);
       
       results.push({
         source: 'news',
@@ -326,8 +682,10 @@ async function collectContent() {
         title,
         description,
         link: item.link,
-        category: categorizeContent(title, description),
-        types: analyzeType(title, description),
+        postDate: item.postdate,
+        primaryCategories,
+        subjects,
+        types,
         timestamp: new Date().toISOString()
       });
       
@@ -337,7 +695,7 @@ async function collectContent() {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // 2차 키워드 뉴스 (목표: 5개)
+  // 2차 키워드 뉴스
   console.log('📌 2차 키워드 뉴스 수집 (목표: 5개)');
   for (const keyword of SECONDARY_KEYWORDS) {
     if (secondaryNewsCount >= 5) break;
@@ -352,8 +710,11 @@ async function collectContent() {
       const title = stripHtml(item.title);
       const description = stripHtml(item.description);
       
-      // 키워드 분석
       analyzeKeywords(title, description);
+      
+      const primaryCategories = analyzePrimaryCategory(title, description);
+      const subjects = analyzeSubject(title, description);
+      const types = analyzePositiveType(title, description);
       
       results.push({
         source: 'news',
@@ -362,8 +723,10 @@ async function collectContent() {
         title,
         description,
         link: item.link,
-        category: categorizeContent(title, description),
-        types: analyzeType(title, description),
+        postDate: item.postdate,
+        primaryCategories,
+        subjects,
+        types,
         timestamp: new Date().toISOString()
       });
       
@@ -375,8 +738,8 @@ async function collectContent() {
   
   console.log('');
   console.log('✅ 수집 완료!');
-  console.log(`📊 블로그: ${primaryBlogCount + secondaryBlogCount}개 (1차: ${primaryBlogCount}, 2차: ${secondaryBlogCount})`);
-  console.log(`📊 뉴스: ${primaryNewsCount + secondaryNewsCount}개 (1차: ${primaryNewsCount}, 2차: ${secondaryNewsCount})`);
+  console.log(`📊 블로그: ${primaryBlogCount + secondaryBlogCount}개`);
+  console.log(`📊 뉴스: ${primaryNewsCount + secondaryNewsCount}개`);
   console.log(`📊 총합: ${results.length}개`);
   
   return results;
@@ -391,7 +754,6 @@ async function saveToUserDB(items) {
     return;
   }
   
-  // 키워드 제안 생성
   const keywordSuggestions = generateKeywordSuggestions();
   
   if (keywordSuggestions.length > 0) {
@@ -405,23 +767,25 @@ async function saveToUserDB(items) {
   for (const userDoc of usersSnapshot.docs) {
     const userData = userDoc.data();
     
-    // 모호한 분류 항목 (유형이 2개 이상)
-    const classificationApprovals = items
-      .filter(item => item.types.length > 1)
+    // 복잡한 케이스 (주체 2개 이상 OR 유형 2개 이상)
+    const complexCases = items
+      .filter(item => item.subjects.length > 1 || item.types.length > 1)
       .map((item, index) => ({
         id: Date.now() + index,
         type: 'classification',
-        title: '모호한 분류: 유형 결정',
-        content: item.title,
-        description: item.description.substring(0, 150) + '...',
+        title: item.title,
+        content: item.description.substring(0, 150) + '...',
         link: item.link,
         source: item.source,
+        postDate: item.postDate,
         keyword: item.keyword,
         priority: item.priority,
-        options: item.types.map(t => ({ label: t.type, percentage: t.confidence }))
+        subjectOptions: item.subjects,
+        typeOptions: item.types,
+        primaryCategories: item.primaryCategories
       }));
     
-    // 키워드 제안 항목
+    // 키워드 제안
     const keywordApprovals = keywordSuggestions.map((suggestion, index) => ({
       id: Date.now() + 1000000 + index,
       type: 'keyword',
@@ -429,65 +793,54 @@ async function saveToUserDB(items) {
       content: `"${suggestion.keyword}" 키워드를 추가하시겠습니까?`,
       description: `이번 수집에서 ${suggestion.frequency}회 발견되었습니다.`,
       keyword: suggestion.keyword,
-      frequency: suggestion.frequency,
-      options: [
-        { label: '1차 키워드로 추가', value: 'primary' },
-        { label: '2차 키워드로 추가', value: 'secondary' },
-        { label: '제외', value: 'exclude' }
-      ]
+      frequency: suggestion.frequency
     }));
     
-    // 자동 승인 항목 (유형이 1개만 있는 것)
-    const autoApprovedItems = items
-      .filter(item => item.types.length === 1)
+    // 자동 승인 (주체 1개 AND 유형 1개)
+    const autoApproved = items
+      .filter(item => item.subjects.length === 1 && item.types.length === 1)
       .map(item => ({
         title: item.title,
-        content: item.title,
-        description: item.description,
+        content: item.description,
         link: item.link,
         source: item.source,
+        postDate: item.postDate,
         keyword: item.keyword,
         priority: item.priority,
-        category: item.category,
+        selectedSubject: item.subjects[0].label,
         selectedType: item.types[0].type,
-        decision: 'approved',
+        primaryCategory: item.primaryCategories[0]?.label || '기타',
+        secondaryCategory: null,
+        classificationReason: {
+          primaryKeywords: item.primaryCategories[0]?.keywords || [],
+          subjectKeywords: item.subjects[0].keywords,
+          typeKeywords: item.types[0].keywords,
+          problems: item.types[0].problems || [],
+          confidence: item.types[0].confidence
+        },
         decidedAt: new Date().toISOString()
       }));
     
-    const allApprovals = [...classificationApprovals, ...keywordApprovals];
+    const allApprovals = [...complexCases, ...keywordApprovals];
     const currentStats = userData.stats || { total: 0, pending: 0, approved: 0, rejected: 0 };
-    
-    // approvedItems에 자동 승인 항목 추가
     const currentApprovedItems = userData.approvedItems || [];
-    const newApprovedItems = [...autoApprovedItems, ...currentApprovedItems];
-    
-    const blogCount = items.filter(i => i.source === 'blog').length;
-    const newsCount = items.filter(i => i.source === 'news').length;
-    const primaryCount = items.filter(i => i.priority === 'primary').length;
-    const secondaryCount = items.filter(i => i.priority === 'secondary').length;
+    const newApprovedItems = [...autoApproved, ...currentApprovedItems];
     
     await db.collection('users').doc(userDoc.id).update({
       stats: {
         total: currentStats.total + items.length,
         pending: currentStats.pending + allApprovals.length,
-        approved: currentStats.approved + autoApprovedItems.length,
+        approved: currentStats.approved + autoApproved.length,
         rejected: currentStats.rejected || 0
       },
       approvalQueue: [...(userData.approvalQueue || []), ...allApprovals],
       approvedItems: newApprovedItems,
-      rejectedItems: userData.rejectedItems || [],
-      activities: [{
-        time: '방금',
-        action: '수집',
-        content: `${items.length}개 수집 (블로그 ${blogCount}, 뉴스 ${newsCount}) [1차: ${primaryCount}, 2차: ${secondaryCount}]${keywordSuggestions.length > 0 ? ` + 키워드 ${keywordSuggestions.length}개 제안` : ''} + 자동승인 ${autoApprovedItems.length}개`
-      }, ...(userData.activities || [])].slice(0, 20),
-      lastCollection: new Date().toISOString()
+      rejectedItems: userData.rejectedItems || []
     });
     
     console.log(`✅ 사용자 ${userDoc.id} 업데이트 완료`);
   }
   
-  // collected 컬렉션에 저장
   for (const item of items) {
     await db.collection('collected').add({ 
       ...item, 
@@ -502,8 +855,8 @@ async function main() {
   try {
     console.log('');
     console.log('═══════════════════════════════════════');
-    console.log('🎓 Learning Dashboard Collector v3.0');
-    console.log('🚀 최적화: display 100 + 랜덤 start + 랜덤 정렬');
+    console.log('팀플레이 유형 데이터 수집기 v4.0');
+    console.log('긍정적 유형 16개 + 주제 카테고리 12개');
     console.log('═══════════════════════════════════════');
     console.log(`시작: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`);
     console.log('');
@@ -515,7 +868,7 @@ async function main() {
       console.log('');
       console.log('🎉 작업 완료!');
     } else {
-      console.log('⚠️ 새 항목 없음 (모두 중복)');
+      console.log('⚠️ 새 항목 없음');
     }
     
     process.exit(0);
