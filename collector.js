@@ -1,41 +1,46 @@
 const admin = require('firebase-admin');
 const axios = require('axios');
 
-// 1. Firebase 설정 및 초기화
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+// 1. 환경 변수 체크 및 Firebase 초기화
+try {
+  if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
+    throw new Error('환경변수 FIREBASE_SERVICE_ACCOUNT가 설정되지 않았습니다.');
+  }
+  
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+  console.log('✅ Firebase 연결 성공');
+} catch (error) {
+  console.error('❌ Firebase 초기화 실패:', error.message);
+  process.exit(1); // 초기화 실패 시 즉시 종료
+}
 
 const db = admin.firestore();
 const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
 
-// 2. 검색 키워드 설정
-const KEYWORDS = ['팀플', '팀프로젝트', '조별과제', '무임승차', '프리라이더', '조장', '조원', '역할분담', '협업', '팀워크'];
+// 네이버 API 키 확인
+if (!NAVER_CLIENT_ID || !NAVER_CLIENT_SECRET) {
+  console.error('❌ 네이버 API 키가 누락되었습니다.');
+  process.exit(1);
+}
 
-// 3. 콘텐츠 분류 로직 (메인/서브 카테고리)
+const KEYWORDS = ['팀플', '팀프로젝트', '조별과제', '무임승차', '프리라이더'];
+
 function categorizeContent(title, description) {
   const text = (title + ' ' + description).toLowerCase();
   if (text.includes('무임승차') || text.includes('프리라이더')) return { main: '팀플', sub: '무임승차형' };
-  if (text.includes('조장') || text.includes('리더')) return { main: '팀플', sub: '주도형' };
-  if (text.includes('역할분담') || text.includes('계획')) return { main: '팀플', sub: '플래너형' };
-  if (text.includes('협업') || text.includes('팀워크')) return { main: '팀플', sub: '협력형' };
   return { main: '팀플', sub: '기타' };
 }
 
-// 4. 세부 유형 분석 로직
 function analyzeType(title, description) {
   const text = (title + ' ' + description).toLowerCase();
-  const types = [];
-  if (text.includes('무임승차') || text.includes('안 함') || text.includes('안함')) types.push({ type: '무임승차형', confidence: 85 });
-  if (text.includes('혼자') || text.includes('다 했') || text.includes('다했')) types.push({ type: '과도헌신형', confidence: 75 });
-  if (text.includes('계획') || text.includes('일정') || text.includes('플래너')) types.push({ type: '플래너형', confidence: 70 });
-  if (text.includes('갈등') || text.includes('싸움') || text.includes('의견충돌')) types.push({ type: '갈등형', confidence: 80 });
-  return types.length > 0 ? types : [{ type: '기타', confidence: 50 }];
+  if (text.includes('무임승차')) return [{ type: '무임승차형', confidence: 85 }];
+  return [{ type: '기타', confidence: 50 }];
 }
 
-// 5. 네이버 블로그 검색 API 호출
 async function searchNaverBlog(keyword, display = 10) {
   try {
     const response = await axios.get('https://openapi.naver.com/v1/search/blog.json', {
@@ -47,22 +52,41 @@ async function searchNaverBlog(keyword, display = 10) {
     });
     return response.data.items || [];
   } catch (error) {
-    console.error(`Blog search error for [${keyword}]:`, error.message);
+    console.error(`❌ 네이버 검색 오류 [${keyword}]:`, error.response ? error.response.status : error.message);
     return [];
   }
 }
 
-// 6. 메인 실행 함수 (데이터 수집 및 저장)
 async function collectAndSave() {
   console.log('🚀 데이터 수집 시작...');
-  
-  for (const keyword of KEYWORDS) {
-    const items = await searchNaverBlog(keyword);
-    
-    for (const item of items) {
-      const category = categorizeContent(item.title, item.description);
-      const analysis = analyzeType(item.title, item.description);
+  try {
+    for (const keyword of KEYWORDS) {
+      const items = await searchNaverBlog(keyword);
+      console.log(`🔍 [${keyword}] 검색 결과: ${items.length}건`);
       
-      // Firestore 저장 데이터 구조화
-      const postData = {
-        title: item.title.replace(/<[^>]*>?
+      for (const item of items) {
+        const category = categorizeContent(item.title, item.description);
+        const analysis = analyzeType(item.title, item.description);
+        
+        const postData = {
+          title: item.title.replace(/<[^>]*>?/gm, ''),
+          link: item.link,
+          description: item.description.replace(/<[^>]*>?/gm, ''),
+          bloggername: item.bloggername,
+          postdate: item.postdate,
+          category: category,
+          analysis: analysis,
+          collectedAt: admin.firestore.FieldValue.serverTimestamp()
+        };
+
+        const docId = Buffer.from(item.link).toString('base64').substring(0, 50);
+        await db.collection('posts').doc(docId).set(postData, { merge: true });
+      }
+    }
+    console.log('✨ 모든 작업 완료!');
+  } catch (error) {
+    console.error('❌ 실행 중 에러 발생:', error);
+  }
+}
+
+collectAndSave();
