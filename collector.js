@@ -21,7 +21,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // Gemini AI 초기화
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-lite' });
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 // 키워드 분류
 const PRIMARY_KEYWORDS = [
@@ -193,10 +193,10 @@ async function collectContent() {
   console.log('🚀 수집 시작...');
   const results = [];
   let targetCounts = {
-    primaryBlog: 55,
-    secondaryBlog: 25,
-    primaryNews: 15,
-    secondaryNews: 5
+    primaryBlog: 10,
+    secondaryBlog: 5,
+    primaryNews: 3,
+    secondaryNews: 2
   };
   let actualCounts = {
     primaryBlog: 0,
@@ -245,7 +245,7 @@ async function collectContent() {
       console.log(`  ✅ 추가 (${actualCounts.primaryBlog}/${targetCounts.primaryBlog})`);
       
       // API 속도 제한 고려
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
     
     await new Promise(resolve => setTimeout(resolve, 100));
