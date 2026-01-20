@@ -377,6 +377,149 @@ async function saveToUserDB(items) {
   for (const userDoc of usersSnapshot.docs) {
     const userData = userDoc.data();
     
+    // 모호한 분류 항목 (유형이 2개 이상)
+    const classificationApprovals = items
+      .filter(item => item.types.length > 1)
+      .map((item, index) => ({
+        id: Date.now() + index,
+        type: 'classification',
+        title: '모호한 분류: 유형 결정',
+        content: item.title,
+        description: item.description.substring(0, 150) + '...',
+        link: item.link,
+        source: item.source,
+        keyword: item.keyword,
+        priority: item.priority,
+        options: item.types.map(t => ({ label: t.type, percentage: t.confidence }))
+      }));
+    
+    // 키워드 제안 항목
+    const keywordApprovals = keywordSuggestions.map((suggestion, index) => ({
+      id: Date.now() + 1000000 + index,
+      type: 'keyword',
+      title: '새 키워드 제안',
+      content: `"${suggestion.keyword}" 키워드를 추가하시겠습니까?`,
+      description: `이번 수집에서 ${suggestion.frequency}회 발견되었습니다.`,
+      keyword: suggestion.keyword,
+      frequency: suggestion.frequency,
+      options: [
+        { label: '1차 키워드로 추가', value: 'primary' },
+        { label: '2차 키워드로 추가', value: 'secondary' },
+        { label: '제외', value: 'exclude' }
+      ]
+    }));
+    
+    // 자동 승인 항목 (유형이 1개만 있는 것)
+    const autoApprovedItems = items
+      .filter(item => item.types.length === 1)
+      .map(item => ({
+        title: item.title,
+        content: item.title,
+        description: item.description,
+        link: item.link,
+        source: item.source,
+        keyword: item.keyword,
+        priority: item.priority,
+        category: item.category,
+        selectedType: item.types[0].type,
+        decision: 'approved',
+        decidedAt: new Date().toISOString()
+      }));
+    
+    const allApprovals = [...classificationApprovals, ...keywordApprovals];
+    const currentStats = userData.stats || { total: 0, pending: 0, approved: 0, rejected: 0 };
+    
+    // approvedItems에 자동 승인 항목 추가
+    const currentApprovedItems = userData.approvedItems || [];
+    const newApprovedItems = [...autoApprovedItems, ...currentApprovedItems];
+    
+    const blogCount = items.filter(i => i.source === 'blog').length;
+    const newsCount = items.filter(i => i.source === 'news').length;
+    const primaryCount = items.filter(i => i.priority === 'primary').length;
+    const secondaryCount = items.filter(i => i.priority === 'secondary').length;
+    
+    await db.collection('users').doc(userDoc.id).update({
+      stats: {
+        total: currentStats.total + items.length,
+        pending: currentStats.pending + allApprovals.length,
+        approved: currentStats.approved + autoApprovedItems.length,
+        rejected: currentStats.rejected || 0
+      },
+      approvalQueue: [...(userData.approvalQueue || []), ...allApprovals],
+      approvedItems: newApprovedItems,
+      rejectedItems: userData.rejectedItems || [],
+      activities: [{
+        time: '방금',
+        action: '수집',
+        content: `${items.length}개 수집 (블로그 ${blogCount}, 뉴스 ${newsCount}) [1차: ${primaryCount}, 2차: ${secondaryCount}]${keywordSuggestions.length > 0 ? ` + 키워드 ${keywordSuggestions.length}개 제안` : ''} + 자동승인 ${autoApprovedItems.length}개`
+      }, ...(userData.activities || [])].slice(0, 20),
+      lastCollection: new Date().toISOString()
+    });
+    
+    console.log(`✅ 사용자 ${userDoc.id} 업데이트 완료`);
+  }
+  
+  // collected 컬렉션에 저장
+  for (const item of items) {
+    await db.collection('collected').add({ 
+      ...item, 
+      collectedAt: new Date().toISOString() 
+    });
+  }
+  
+  console.log('✅ 저장 완료!');
+}
+```
+
+---
+
+## ✨ 수정 내용
+
+### 추가된 기능:
+1. **자동 승인 항목 처리**
+   - 유형이 1개만 있으면 자동으로 approvedItems에 저장
+   - 유형이 2개 이상이면 approvalQueue로 (사용자 결정 필요)
+
+2. **approvedItems, rejectedItems 지원**
+   - 빈 배열로 초기화
+   - 자동 승인된 것 바로 저장
+
+3. **통계 정확도 향상**
+   - 자동 승인된 개수 즉시 반영
+
+---
+
+## 🎯 이제 동작 방식
+```
+수집 100개
+    ↓
+유형 1개 (70개) → approvedItems (자동 승인) ✅
+유형 2개 이상 (30개) → approvalQueue (사용자 결정 필요) ⏳
+    ↓
+사용자 승인 → approvedItems ✅
+사용자 거절 → rejectedItems ❌
+  console.log('💾 데이터 저장 중...');
+  
+  const usersSnapshot = await db.collection('users').get();
+  if (usersSnapshot.empty) {
+    console.log('⚠️ 사용자 없음');
+    return;
+  }
+  
+  // 키워드 제안 생성
+  const keywordSuggestions = generateKeywordSuggestions();
+  
+  if (keywordSuggestions.length > 0) {
+    console.log('');
+    console.log('🔑 새 키워드 제안:');
+    keywordSuggestions.forEach(s => {
+      console.log(`   - "${s.keyword}" (${s.frequency}회 발견)`);
+    });
+  }
+  
+  for (const userDoc of usersSnapshot.docs) {
+    const userData = userDoc.data();
+    
     // 모호한 분류 항목
     const classificationApprovals = items
       .filter(item => item.types.length > 1)
