@@ -1,6 +1,5 @@
 const admin = require('firebase-admin');
 const axios = require('axios');
-const Anthropic = require('@anthropic-ai/sdk');
 
 // Firebase 초기화
 try {
@@ -17,22 +16,10 @@ try {
 const db = admin.firestore();
 const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-
-// Claude AI 초기화
-const anthropic = new Anthropic({
-  apiKey: ANTHROPIC_API_KEY,
-});
 
 // 키워드 분류
 const PRIMARY_KEYWORDS = [
-  '공모전', '팀플', '팀프로젝트', '대회', '세미나', '조별과제', '협업',
-  '컬래버레이션', '콜라보', '워크샵', '해커톤', '프로젝트팀', '동아리', '학회'
-];
-
-const SECONDARY_KEYWORDS = [
-  '주도', '조장', '역할분담', '리더십', '책임',
-  '단체', '연합', '연대', '총회', '회의', '소통', '의사결정', '협력'
+  '공모전', '팀플', '팀프로젝트', '대회', '세미나', '조별과제', '협업'
 ];
 
 function stripHtml(html) {
@@ -44,7 +31,7 @@ async function isDuplicate(link) {
   return !snapshot.empty;
 }
 
-// ========== 블로그 필터링 (우선순위별) ==========
+// ========== 블로그 필터링 ==========
 function filterBlog(title, description) {
   const text = (title + ' ' + description).toLowerCase();
   
@@ -76,131 +63,116 @@ function filterNews(title, description) {
     return { pass: false, reason: '키워드 없음' };
   }
   
-  // 고유명사(2-4글자 한글) 빈도 체크
+  // 고유명사 빈도 체크
   const words = text.match(/[가-힣]{2,4}/g) || [];
   const wordCount = {};
   
   words.forEach(word => {
-    // 일반 단어 제외
     const commonWords = ['하는', '있는', '없는', '되는', '이를', '그는', '같은', '위한', '대한', '등의'];
     if (commonWords.includes(word)) return;
     
     wordCount[word] = (wordCount[word] || 0) + 1;
   });
   
-  // 3번 이상 반복되는 단어가 있는지
   const repeated = Object.entries(wordCount).filter(([word, count]) => count >= 3);
   
   if (repeated.length > 0) {
     return { 
       pass: true, 
       entities: repeated.map(([word, count]) => `${word}(${count}회)`).join(', '),
-      reason: '인물/기관명 반복 + 키워드'
+      reason: '인물/기관명 반복'
     };
   }
   
   return { pass: false, reason: '반복 단어 부족' };
 }
 
-// Claude로 케이스 분석
-async function analyzeWithClaude(title, description) {
-  const prompt = `다음은 팀 프로젝트나 협업에 관한 블로그/뉴스 내용입니다.
-
-제목: ${title}
-내용: ${description}
-
-다음 기준으로 분석해주세요:
-
-1. **행위 주체 추출** (누가 이 행동을 했는지 구체적으로)
-   - 예시: "컴공 학생", "스타트업 기획자", "정치인", "대학원생", "마케터" 등
-   - 일반적인 "학생", "직장인"보다는 더 구체적으로 추출
-   - 신뢰도 점수 (0-100)
-
-2. **팀플레이 유형 분류** (긍정적인 행동만!)
-   다음 16가지 긍정 유형 중 해당되는 것:
-   
-   리더십 계열: 주도형, 비전제시형, 전략가형
-   실행 계열: 실행형, 완수형, 속도형
-   협업 계열: 협력형, 조율자형, 지원형
-   소통 계열: 소통형, 경청형, 중재형
-   혁신 계열: 혁신형, 창의형, 분석형
-   안정 계열: 신뢰구축형
-   
-   - 부정적 내용(무임승차, 갈등, 독단 등)은 제외
-   - 부정적 상황을 극복한 경우는 긍정 유형으로 분류 가능
-   - 신뢰도 점수 (0-100)
-
-3. **1차 카테고리** (주제 분류)
-   정치, 사회, 경제, 과학, 공학, 의료, 교육, 문화, 스포츠, 환경, 기술, 기타
-   - 신뢰도 점수
-
-4. **발췌 부분** 
-   - 원문에서 팀플레이 행동이 가장 잘 드러나는 1-2문장 추출
-
-5. **분류 근거**
-   - 왜 이 주체로 판단했는지
-   - 왜 이 유형으로 판단했는지
-   - 긍정적 행동인 이유
-
-다음 JSON 형식으로만 답변해주세요 (다른 설명 없이):
-{
-  "actor": {
-    "label": "구체적 행위 주체",
-    "confidence": 85,
-    "alternatives": ["대안1", "대안2"]
-  },
-  "teamType": {
-    "label": "팀플 유형",
-    "category": "리더십/실행/협업/소통/혁신/안정",
-    "confidence": 80,
-    "alternatives": ["대안유형1", "대안유형2"]
-  },
-  "primaryCategory": {
-    "label": "카테고리명",
-    "confidence": 90
-  },
-  "excerpt": "원문 발췌 1-2문장",
-  "reason": {
-    "actorReason": "주체 판단 근거",
-    "typeReason": "유형 판단 근거",
-    "isPositive": true
+// ========== 키워드 기반 간단 분석 ==========
+function simpleAnalyze(title, description) {
+  const text = (title + ' ' + description).toLowerCase();
+  
+  // 행위 주체 분류
+  let actor = '기타';
+  let actorConfidence = 50;
+  
+  if (text.includes('학생') || text.includes('대학') || text.includes('학교')) {
+    actor = '학생';
+    actorConfidence = 60;
+  } else if (text.includes('직장') || text.includes('회사') || text.includes('업무')) {
+    actor = '직장인';
+    actorConfidence = 60;
+  } else if (text.includes('정치') || text.includes('의원') || text.includes('국회')) {
+    actor = '정치인';
+    actorConfidence = 70;
   }
-}
-
-만약 이 내용이 팀플레이와 관련 없거나 부정적 내용만 있다면:
-{ "isRelevant": false, "reason": "이유" }`;
-
-  try {
-    const message = await anthropic.messages.create({
-      model: 'claude-haiku-4-20250514',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: prompt
-      }]
-    });
-    
-    const text = message.content[0].text;
-    
-    // JSON 파싱
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.log('⚠️ JSON 파싱 실패:', text.substring(0, 100));
-      return null;
-    }
-    
-    const analysis = JSON.parse(jsonMatch[0]);
-    
-    // 관련 없는 내용 필터링
-    if (analysis.isRelevant === false) {
-      return null;
-    }
-    
-    return analysis;
-  } catch (error) {
-    console.error('❌ Claude 분석 오류:', error.message);
-    return null;
+  
+  // 팀플 유형 분류
+  let teamType = '협력형';
+  let teamCategory = '협업';
+  let typeConfidence = 50;
+  
+  if (text.includes('주도') || text.includes('이끌') || text.includes('리더')) {
+    teamType = '주도형';
+    teamCategory = '리더십';
+    typeConfidence = 60;
+  } else if (text.includes('협업') || text.includes('협력') || text.includes('함께')) {
+    teamType = '협력형';
+    teamCategory = '협업';
+    typeConfidence = 60;
+  } else if (text.includes('소통') || text.includes('대화')) {
+    teamType = '소통형';
+    teamCategory = '소통';
+    typeConfidence = 60;
+  } else if (text.includes('창의') || text.includes('아이디어')) {
+    teamType = '창의형';
+    teamCategory = '혁신';
+    typeConfidence = 60;
   }
+  
+  // 카테고리 분류
+  let category = '기타';
+  let categoryConfidence = 50;
+  
+  if (text.includes('교육') || text.includes('학교') || text.includes('대학')) {
+    category = '교육';
+    categoryConfidence = 70;
+  } else if (text.includes('기술') || text.includes('개발') || text.includes('프로그램')) {
+    category = '기술';
+    categoryConfidence = 70;
+  } else if (text.includes('정치') || text.includes('정부')) {
+    category = '정치';
+    categoryConfidence = 70;
+  } else if (text.includes('경제') || text.includes('기업')) {
+    category = '경제';
+    categoryConfidence = 70;
+  }
+  
+  // 발췌 (첫 100자)
+  const excerpt = description.substring(0, 100) + '...';
+  
+  return {
+    actor: {
+      label: actor,
+      confidence: actorConfidence,
+      alternatives: []
+    },
+    teamType: {
+      label: teamType,
+      category: teamCategory,
+      confidence: typeConfidence,
+      alternatives: []
+    },
+    primaryCategory: {
+      label: category,
+      confidence: categoryConfidence
+    },
+    excerpt: excerpt,
+    reason: {
+      actorReason: '키워드 매칭',
+      typeReason: '키워드 매칭',
+      isPositive: true
+    }
+  };
 }
 
 // 네이버 블로그 검색
@@ -249,10 +221,10 @@ async function collectContent() {
   console.log('🚀 수집 시작...');
   const results = [];
   let targetCounts = {
-    priority1: 5,  // 공모전+후기
-    priority2: 5,  // 공모전만
-    priority3: 5,  // 팀+참여+후기
-    news: 5        // 뉴스
+    priority1: 15,  // 공모전+후기
+    priority2: 15,  // 공모전만
+    priority3: 10,  // 팀+참여+후기
+    news: 10        // 뉴스
   };
   let actualCounts = {
     priority1: 0,
@@ -261,7 +233,7 @@ async function collectContent() {
     news: 0
   };
   
-  // ========== 블로그 수집 (우선순위별) ==========
+  // ========== 블로그 수집 ==========
   console.log('📌 블로그 수집 시작...');
   
   const blogItems = [];
@@ -275,7 +247,7 @@ async function collectContent() {
   console.log(`📊 총 ${blogItems.length}개 블로그 검색 완료`);
   console.log('🔍 필터링 중...');
   
-  // 우선순위별로 분류
+  // 우선순위별 분류
   const priority1 = [];
   const priority2 = [];
   const priority3 = [];
@@ -288,12 +260,7 @@ async function collectContent() {
     const filter = filterBlog(title, description);
     
     if (filter.pass) {
-      const data = {
-        item,
-        title,
-        description,
-        filterReason: filter.reason
-      };
+      const data = { item, title, description, filterReason: filter.reason };
       
       if (filter.priority === 1) priority1.push(data);
       else if (filter.priority === 2) priority2.push(data);
@@ -306,17 +273,12 @@ async function collectContent() {
   console.log(`✅ 3순위(팀+참여+후기): ${priority3.length}개`);
   
   // 1순위 처리
-  console.log('\n📌 1순위 블로그 분석 중...');
+  console.log('\n📌 1순위 블로그 처리 중...');
   for (const data of priority1) {
     if (actualCounts.priority1 >= targetCounts.priority1) break;
     
-    console.log(`  🤖 [1순위] ${data.title.substring(0, 30)}...`);
-    const analysis = await analyzeWithClaude(data.title, data.description);
-    
-    if (!analysis) {
-      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
-      continue;
-    }
+    console.log(`  ✅ [1순위] ${data.title.substring(0, 40)}...`);
+    const analysis = simpleAnalyze(data.title, data.description);
     
     results.push({
       source: 'blog',
@@ -331,23 +293,15 @@ async function collectContent() {
     });
     
     actualCounts.priority1++;
-    console.log(`  ✅ 추가 (${actualCounts.priority1}/${targetCounts.priority1})`);
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
   }
   
   // 2순위 처리
-  console.log('\n📌 2순위 블로그 분석 중...');
+  console.log('\n📌 2순위 블로그 처리 중...');
   for (const data of priority2) {
     if (actualCounts.priority2 >= targetCounts.priority2) break;
     
-    console.log(`  🤖 [2순위] ${data.title.substring(0, 30)}...`);
-    const analysis = await analyzeWithClaude(data.title, data.description);
-    
-    if (!analysis) {
-      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
-      continue;
-    }
+    console.log(`  ✅ [2순위] ${data.title.substring(0, 40)}...`);
+    const analysis = simpleAnalyze(data.title, data.description);
     
     results.push({
       source: 'blog',
@@ -362,23 +316,15 @@ async function collectContent() {
     });
     
     actualCounts.priority2++;
-    console.log(`  ✅ 추가 (${actualCounts.priority2}/${targetCounts.priority2})`);
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
   }
   
   // 3순위 처리
-  console.log('\n📌 3순위 블로그 분석 중...');
+  console.log('\n📌 3순위 블로그 처리 중...');
   for (const data of priority3) {
     if (actualCounts.priority3 >= targetCounts.priority3) break;
     
-    console.log(`  🤖 [3순위] ${data.title.substring(0, 30)}...`);
-    const analysis = await analyzeWithClaude(data.title, data.description);
-    
-    if (!analysis) {
-      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
-      continue;
-    }
+    console.log(`  ✅ [3순위] ${data.title.substring(0, 40)}...`);
+    const analysis = simpleAnalyze(data.title, data.description);
     
     results.push({
       source: 'blog',
@@ -393,9 +339,6 @@ async function collectContent() {
     });
     
     actualCounts.priority3++;
-    console.log(`  ✅ 추가 (${actualCounts.priority3}/${targetCounts.priority3})`);
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
   }
   
   // ========== 뉴스 수집 ==========
@@ -425,8 +368,7 @@ async function collectContent() {
         item,
         title,
         description,
-        entities: filter.entities,
-        filterReason: filter.reason
+        entities: filter.entities
       });
     }
   }
@@ -434,18 +376,13 @@ async function collectContent() {
   console.log(`✅ 필터 통과 뉴스: ${filteredNews.length}개`);
   
   // 뉴스 처리
-  console.log('\n📌 뉴스 분석 중...');
+  console.log('\n📌 뉴스 처리 중...');
   for (const data of filteredNews) {
     if (actualCounts.news >= targetCounts.news) break;
     
-    console.log(`  🤖 [뉴스] ${data.title.substring(0, 30)}...`);
-    console.log(`      반복 단어: ${data.entities}`);
-    const analysis = await analyzeWithClaude(data.title, data.description);
-    
-    if (!analysis) {
-      console.log(`  ⏭️  AI 분석 실패 - 스킵`);
-      continue;
-    }
+    console.log(`  ✅ [뉴스] ${data.title.substring(0, 40)}...`);
+    console.log(`      반복: ${data.entities}`);
+    const analysis = simpleAnalyze(data.title, data.description);
     
     results.push({
       source: 'news',
@@ -460,9 +397,6 @@ async function collectContent() {
     });
     
     actualCounts.news++;
-    console.log(`  ✅ 추가 (${actualCounts.news}/${targetCounts.news})`);
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
   }
   
   console.log('');
@@ -479,32 +413,12 @@ async function collectContent() {
 async function saveToCases(items) {
   console.log('💾 데이터 저장 중...');
   
-  let autoApproved = 0;
-  let pendingReview = 0;
-  
   for (const item of items) {
     const analysis = item.analysis;
     
-    // 신뢰도 기반 자동 승인 판단
-    const actorConfident = analysis.actor.confidence >= 80;
-    const typeConfident = analysis.teamType.confidence >= 80;
-    const isAutoApproved = actorConfident && typeConfident;
-    
-    // 검토 필요 여부
-    let status = 'auto-approved';
-    let needsReview = [];
-    
-    if (!actorConfident) {
-      status = 'pending-actor';
-      needsReview.push('actor');
-    }
-    if (!typeConfident) {
-      status = 'pending-type';
-      needsReview.push('type');
-    }
-    if (!actorConfident && !typeConfident) {
-      status = 'pending-both';
-    }
+    // 키워드 매칭이라 신뢰도 낮음 → 모두 검토 대기
+    const status = 'pending-both';
+    const needsReview = ['actor', 'type'];
     
     // cases 컬렉션에 저장
     const caseData = {
@@ -521,14 +435,14 @@ async function saveToCases(items) {
       actor: {
         label: analysis.actor.label,
         confidence: analysis.actor.confidence,
-        options: analysis.actor.alternatives || []
+        options: analysis.actor.alternatives
       },
       
       teamType: {
         label: analysis.teamType.label,
         category: analysis.teamType.category,
         confidence: analysis.teamType.confidence,
-        options: analysis.teamType.alternatives || []
+        options: analysis.teamType.alternatives
       },
       
       primaryCategory: {
@@ -547,16 +461,10 @@ async function saveToCases(items) {
       
       status: status,
       needsReview: needsReview,
-      reviewedAt: isAutoApproved ? item.timestamp : null
+      reviewedAt: null
     };
     
     await db.collection('cases').add(caseData);
-    
-    if (isAutoApproved) {
-      autoApproved++;
-    } else {
-      pendingReview++;
-    }
     
     // 로그 저장
     await db.collection('logs').add({
@@ -567,17 +475,16 @@ async function saveToCases(items) {
     });
   }
   
-  console.log(`✅ 저장 완료!`);
-  console.log(`   자동 승인: ${autoApproved}개`);
-  console.log(`   검토 대기: ${pendingReview}개`);
+  console.log(`✅ 저장 완료! ${items.length}개`);
+  console.log(`   (모두 검토 대기 상태로 저장됨)`);
 }
 
 async function main() {
   try {
     console.log('');
     console.log('═══════════════════════════════════════');
-    console.log('팀플레이 유형 데이터 수집기 v5.2');
-    console.log('정교한 필터링 + Claude AI 분석');
+    console.log('팀플레이 유형 데이터 수집기 v6.0');
+    console.log('키워드 필터링 버전 (AI 없음)');
     console.log('═══════════════════════════════════════');
     console.log(`시작: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`);
     console.log('');
