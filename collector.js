@@ -14,6 +14,9 @@ try {
 }
 
 const db = admin.firestore();
+db.settings({
+  ignoreUndefinedProperties: true
+});
 const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
 
