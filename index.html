@@ -1510,14 +1510,14 @@
     import { getFirestore, collection, query, orderBy, limit, getDocs, where, doc, getDoc, updateDoc, deleteDoc, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     // Firebase 설정 - 여기에 새로 발급받은 키를 입력하세요
-    const firebaseConfig = {
-      apiKey: "",  // 새로 발급받은 API 키를 여기에 입력
-      authDomain: "",
-      projectId: "",
-      storageBucket: "",
-      messagingSenderId: "",
-      appId: ""
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyAmv5MlHGbzrZBw8lsMxt4vXYTwcetRcxI",
+  authDomain: "tpt-learning-49601.firebaseapp.com",
+  projectId: "tpt-learning-49601",
+  storageBucket: "tpt-learning-49601.firebasestorage.app",
+  messagingSenderId: "602423446232",
+  appId: "1:602423446232:web:3bfc2783050a35c97225ad"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
