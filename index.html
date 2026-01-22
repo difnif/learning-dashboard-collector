@@ -670,198 +670,355 @@ body.dark-mode .tab-button.board.active {
       cursor: pointer;
     }
 
-    /* ================== 검토 탭 스타일 ================== */
-    .review-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: calc(100vh - 200px);
-      padding: 20px;
-    }
+/* ================== 검토 탭 스타일 ================== */
+.review-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 250px);
+  padding: 20px;
+  position: relative;
+  perspective: 1000px;
+}
 
-    .review-card {
-      background: var(--bg-secondary);
-      border-radius: 16px;
-      box-shadow: 0 8px 24px var(--card-shadow);
-      max-width: 600px;
-      width: 100%;
-      overflow: hidden;
-      transition: all 0.3s;
-    }
+.review-card {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px var(--card-shadow);
+  max-width: 500px;
+  width: 100%;
+  overflow: visible;
+  position: absolute;
+  transition: none;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
 
-    .review-card.slide-out-left {
-      animation: slideOutLeft 0.3s forwards;
-    }
+.review-card:active {
+  cursor: grabbing;
+}
 
-    .review-card.slide-out-right {
-      animation: slideOutRight 0.3s forwards;
-    }
+.review-card.dragging {
+  transition: none !important;
+}
 
-    .review-card.slide-out-down {
-      animation: slideOutDown 0.3s forwards;
-    }
+.review-card.swiping-left {
+  border: 3px solid #C62828;
+  box-shadow: 0 10px 40px rgba(198, 40, 40, 0.4);
+}
 
-    @keyframes slideOutLeft {
-      to { transform: translateX(-150%) rotate(-10deg); opacity: 0; }
-    }
+.review-card.swiping-right {
+  border: 3px solid #FF6B35;
+  box-shadow: 0 10px 40px rgba(255, 107, 53, 0.4);
+}
 
-    @keyframes slideOutRight {
-      to { transform: translateX(150%) rotate(10deg); opacity: 0; }
-    }
+.review-card.swipe-out-left {
+  animation: swipeOutLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
-    @keyframes slideOutDown {
-      to { transform: translateY(100%); opacity: 0; }
-    }
+.review-card.swipe-out-right {
+  animation: swipeOutRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
 
-    .review-card-header {
-      padding: 20px;
-      border-bottom: 2px solid var(--border-color);
-    }
+@keyframes swipeOutLeft {
+  to { 
+    transform: translateX(-150%) rotate(-30deg); 
+    opacity: 0; 
+  }
+}
 
-    .review-type-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
+@keyframes swipeOutRight {
+  to { 
+    transform: translateX(150%) rotate(30deg); 
+    opacity: 0; 
+  }
+}
 
-    .review-type-badge.actor {
-      background: #FFF3E0;
-      color: #F57C00;
-      border: 2px solid #F57C00;
-    }
+.review-card.reset {
+  animation: resetCard 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .review-type-badge.type {
-      background: #E8F5E9;
-      color: #2E7D32;
-      border: 2px solid #2E7D32;
-    }
+@keyframes resetCard {
+  0% { transform: translateX(var(--drag-x)) rotate(var(--drag-rotate)); }
+  100% { transform: translateX(0) rotate(0); }
+}
 
-    .review-type-badge.both {
-      background: #E3F2FD;
-      color: #1565C0;
-      border: 2px solid #1565C0;
-    }
+.review-card-header {
+  padding: 24px 24px 16px 24px;
+  border-bottom: 2px solid var(--border-color);
+}
 
-    .review-card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
+.review-type-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
 
-    .review-card-body {
-      padding: 20px;
-    }
+.review-type-badge.actor {
+  background: #FFF3E0;
+  color: #F57C00;
+  border: 2px solid #F57C00;
+}
 
-    .review-section {
-      margin-bottom: 20px;
-    }
+.review-type-badge.type {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 2px solid #2E7D32;
+}
 
-    .review-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
+.review-type-badge.both {
+  background: #E3F2FD;
+  color: #1565C0;
+  border: 2px solid #1565C0;
+}
 
-    .review-content {
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--text-primary);
-      background: var(--bg-primary);
-      padding: 12px;
-      border-radius: 8px;
-    }
+.review-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: 0;
+}
 
-    .review-excerpt {
-      background: #FFF9F5;
-      border-left: 4px solid #FF6B35;
-      padding: 12px;
-      font-style: italic;
-      margin: 12px 0;
-      color: var(--text-primary);
-    }
+.review-card-body {
+  padding: 20px 24px;
+  max-height: 300px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    body.dark-mode .review-excerpt {
-      background: rgba(255, 107, 53, 0.1);
-    }
+.review-card-body.expanded {
+  max-height: 600px;
+  overflow-y: auto;
+}
 
-    .review-options {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
+.review-card-body.expanded::after {
+  display: none;
+}
 
-    .option-chip {
-      padding: 8px 16px;
-      background: var(--bg-primary);
-      border: 2px solid transparent;
-      border-radius: 20px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+.review-card-body::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--bg-secondary));
+  pointer-events: none;
+}
 
-    .option-chip:hover {
-      border-color: #FF6B35;
-      background: #FFF3E0;
-    }
+.review-section {
+  margin-bottom: 16px;
+}
 
-    body.dark-mode .option-chip:hover {
-      background: rgba(255, 107, 53, 0.2);
-    }
+.review-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
 
-    .review-card-footer {
-      padding: 20px;
-      background: var(--bg-primary);
-      display: flex;
-      gap: 8px;
-    }
+.review-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
 
-    .footer-button {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+.review-excerpt {
+  background: #FFF9F5;
+  border-left: 4px solid #FF6B35;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0;
+  color: var(--text-primary);
+  border-radius: 4px;
+}
 
-    .footer-button.option-a {
-      background: #E3F2FD;
-      color: #1565C0;
-    }
+body.dark-mode .review-excerpt {
+  background: rgba(255, 107, 53, 0.1);
+}
 
-    .footer-button.option-b {
-      background: #F3E5F5;
-      color: #7B1FA2;
-    }
+.review-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
 
-    .footer-button.refresh {
-      background: #FFF3E0;
-      color: #F57C00;
-      flex: 0.5;
-    }
+.option-chip {
+  padding: 8px 16px;
+  background: var(--bg-primary);
+  border: 2px solid transparent;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-    .footer-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+.option-chip:hover {
+  border-color: #FF6B35;
+  background: #FFF3E0;
+}
 
-    .refresh-count {
-      font-size: 11px;
-      opacity: 0.7;
-      margin-top: 2px;
-    }
+body.dark-mode .option-chip:hover {
+  background: rgba(255, 107, 53, 0.2);
+}
+
+.expand-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.expand-button:hover {
+  background: var(--border-color);
+}
+
+.expand-button svg {
+  transition: transform 0.3s;
+}
+
+.expand-button.expanded svg {
+  transform: rotate(180deg);
+}
+
+.review-card-footer {
+  padding: 16px 24px 24px 24px;
+  background: var(--bg-primary);
+  display: flex;
+  gap: 12px;
+  border-top: 2px solid var(--border-color);
+}
+
+.footer-button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footer-button.option-a {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.footer-button.option-a:hover {
+  background: #BBDEFB;
+}
+
+.footer-button.option-b {
+  background: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.footer-button.option-b:hover {
+  background: #E1BEE7;
+}
+
+.footer-button.refresh {
+  background: #FFF3E0;
+  color: #F57C00;
+  flex: 0.7;
+}
+
+.footer-button.refresh:hover {
+  background: #FFE0B2;
+}
+
+.footer-button:active {
+  transform: scale(0.95);
+}
+
+.refresh-count {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* 스와이프 가이드 */
+.swipe-guide {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px var(--card-shadow);
+  z-index: 999;
+  animation: fadeIn 0.3s;
+}
+
+@media (max-width: 768px) {
+  .review-container {
+    min-height: calc(100vh - 200px);
+    padding: 12px;
+  }
+
+  .review-card {
+    max-width: 100%;
+  }
+
+  .review-card-header {
+    padding: 20px 16px 12px 16px;
+  }
+
+  .review-card-body {
+    padding: 16px;
+    max-height: 250px;
+  }
+
+  .review-card-body.expanded {
+    max-height: 500px;
+  }
+
+  .review-card-footer {
+    padding: 12px 16px 20px 16px;
+    flex-wrap: wrap;
+  }
+
+  .footer-button {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  .footer-button.refresh {
+    flex: 1;
+  }
+}
 
     /* ================== 보드 탭 스타일 ================== */
     .manual-collect-section {
@@ -1527,20 +1684,37 @@ body.dark-mode .tab-button.board.active {
     </div>
   </div>
 
-  <!-- 검토 탭 컨텐츠 -->
-  <div id="review-content" class="content">
-    <div class="content-header">
-      <h1 class="content-title">✅ 검토</h1>
-      <p class="content-subtitle">분류 검토가 필요한 케이스 <span id="review-count"></span></p>
-    </div>
+ <!-- 검토 탭 컨텐츠 -->
+<div id="review-content" class="content">
+  <div class="content-header">
+    <h1 class="content-title">✅ 검토</h1>
+    <p class="content-subtitle">분류 검토가 필요한 케이스 <span id="review-count"></span></p>
+  </div>
 
-    <div id="review-container" class="review-container">
-      <div class="loading">
-        <div class="loading-spinner"></div>
-        <div>검토 케이스 로딩 중...</div>
+  <div id="review-container" class="review-container">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div>검토 케이스 로딩 중...</div>
+    </div>
+  </div>
+  
+  <!-- 스와이프 가이드 -->
+  <div id="swipe-guide" class="swipe-guide" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div style="text-align: left;">
+        <div style="font-size: 24px; margin-bottom: 4px;">👈</div>
+        <div style="font-size: 12px; font-weight: 600;">삭제</div>
+      </div>
+      <div style="text-align: center; color: var(--text-secondary);">
+        <div style="font-size: 14px;">← 스와이프 →</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 24px; margin-bottom: 4px;">👉</div>
+        <div style="font-size: 12px; font-weight: 600;">보류</div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- 보드 탭 컨텐츠 -->
   <div id="board-content" class="content active">
@@ -2135,12 +2309,17 @@ const firebaseConfig = {
               <div class="empty-state-text">검토할 케이스가 없습니다!</div>
             </div>
           `;
+          document.getElementById('swipe-guide').style.display = 'none';
           return;
         }
         
         window.reviewIndex = 0;
         window.refreshCount = 0;
+        window.reviewStartTime = Date.now();
         showReviewCard();
+        
+        // 스와이프 가이드 표시
+        document.getElementById('swipe-guide').style.display = 'block';
       } catch (error) {
         handleError('검토 데이터를 불러오는데 실패했습니다', error);
       }
@@ -2154,6 +2333,7 @@ const firebaseConfig = {
             <div class="empty-state-text">모든 검토 완료!</div>
           </div>
         `;
+        document.getElementById('swipe-guide').style.display = 'none';
         return;
       }
       
@@ -2180,7 +2360,7 @@ const firebaseConfig = {
         optionsHtml += '<div class="review-label">행위 주체 옵션</div>';
         optionsHtml += '<div class="review-options">';
         options.forEach((opt, i) => {
-          optionsHtml += `<div class="option-chip" data-type="actor" data-value="${opt}">A${i + 1}: ${opt}</div>`;
+          optionsHtml += `<div class="option-chip">A${i + 1}: ${opt}</div>`;
         });
         optionsHtml += '</div></div>';
       }
@@ -2191,7 +2371,7 @@ const firebaseConfig = {
         optionsHtml += '<div class="review-label">팀플 유형 옵션</div>';
         optionsHtml += '<div class="review-options">';
         options.forEach((opt, i) => {
-          optionsHtml += `<div class="option-chip" data-type="type" data-value="${opt}">B${i + 1}: ${opt}</div>`;
+          optionsHtml += `<div class="option-chip">B${i + 1}: ${opt}</div>`;
         });
         optionsHtml += '</div></div>';
       }
@@ -2202,7 +2382,7 @@ const firebaseConfig = {
             <div class="review-type-badge ${reviewTypeClass}">${reviewType}</div>
             <div class="review-card-title">${data.title || '제목 없음'}</div>
           </div>
-          <div class="review-card-body">
+          <div class="review-card-body" id="review-card-body">
             <div class="review-section">
               <div class="review-label">발췌</div>
               <div class="review-excerpt">${data.excerpt || data.content?.substring(0, 150) + '...' || '내용 없음'}</div>
@@ -2212,9 +2392,16 @@ const firebaseConfig = {
             
             <div class="review-section">
               <div class="review-label">분류 근거</div>
-              <div class="review-content">${data.classificationReason?.actorReason || '-'}</div>
-              <div class="review-content">${data.classificationReason?.typeReason || '-'}</div>
+              ${data.classificationReason?.actorReason ? `<div class="review-content">${data.classificationReason.actorReason}</div>` : ''}
+              ${data.classificationReason?.typeReason ? `<div class="review-content">${data.classificationReason.typeReason}</div>` : ''}
             </div>
+            
+            <button class="expand-button" onclick="toggleExpand()">
+              <span id="expand-text">더보기</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
           </div>
           <div class="review-card-footer">
             <button class="footer-button option-a" onclick="selectOption('A')">A안</button>
@@ -2228,18 +2415,213 @@ const firebaseConfig = {
       `;
       
       document.getElementById('review-container').innerHTML = html;
+      
+      // 스와이프 이벤트 등록
+      setTimeout(() => {
+        initSwipe();
+      }, 100);
+    }
+    
+    // 더보기/접기 토글
+    window.toggleExpand = function() {
+      const body = document.getElementById('review-card-body');
+      const button = event.currentTarget;
+      const text = document.getElementById('expand-text');
+      
+      if (body.classList.contains('expanded')) {
+        body.classList.remove('expanded');
+        button.classList.remove('expanded');
+        text.textContent = '더보기';
+      } else {
+        body.classList.add('expanded');
+        button.classList.add('expanded');
+        text.textContent = '접기';
+      }
+    };
+    
+    // 스와이프 초기화
+    function initSwipe() {
+      const card = document.getElementById('current-review-card');
+      if (!card) return;
+      
+      let startX = 0;
+      let startY = 0;
+      let currentX = 0;
+      let currentY = 0;
+      let isDragging = false;
+      
+      const onStart = (e) => {
+        const touch = e.type.includes('touch') ? e.touches[0] : e;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        isDragging = true;
+        card.classList.add('dragging');
+      };
+      
+      const onMove = (e) => {
+        if (!isDragging) return;
+        
+        e.preventDefault();
+        const touch = e.type.includes('touch') ? e.touches[0] : e;
+        currentX = touch.clientX - startX;
+        currentY = touch.clientY - startY;
+        
+        // 좌우 이동만 허용 (세로 스크롤 방지)
+        if (Math.abs(currentX) > Math.abs(currentY)) {
+          const rotation = currentX / 20;
+          card.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
+          card.style.setProperty('--drag-x', `${currentX}px`);
+          card.style.setProperty('--drag-rotate', `${rotation}deg`);
+          
+          // 스와이프 방향 표시
+          if (currentX < -50) {
+            card.classList.add('swiping-left');
+            card.classList.remove('swiping-right');
+          } else if (currentX > 50) {
+            card.classList.add('swiping-right');
+            card.classList.remove('swiping-left');
+          } else {
+            card.classList.remove('swiping-left', 'swiping-right');
+          }
+        }
+      };
+      
+      const onEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        card.classList.remove('dragging', 'swiping-left', 'swiping-right');
+        
+        // 스와이프 판정
+        if (currentX < -100) {
+          // 좌측 스와이프: 삭제
+          swipeLeft();
+        } else if (currentX > 100) {
+          // 우측 스와이프: 보류 (맨 뒤로)
+          swipeRight();
+        } else {
+          // 원위치
+          card.classList.add('reset');
+          card.style.transform = '';
+          setTimeout(() => card.classList.remove('reset'), 300);
+        }
+        
+        currentX = 0;
+        currentY = 0;
+      };
+      
+      // 터치 이벤트
+      card.addEventListener('touchstart', onStart, { passive: true });
+      card.addEventListener('touchmove', onMove, { passive: false });
+      card.addEventListener('touchend', onEnd);
+      
+      // 마우스 이벤트 (PC용)
+      card.addEventListener('mousedown', onStart);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onEnd);
+    }
+    
+    // 좌측 스와이프: 삭제
+    async function swipeLeft() {
+      const card = document.getElementById('current-review-card');
+      card.classList.add('swipe-out-left');
+      
+      showToast('케이스가 삭제되었습니다', 'success');
+      
+      const current = window.reviewQueue[window.reviewIndex];
+      
+      try {
+        // AI 학습 데이터 저장 (부정 샘플)
+        if (window.saveAITrainingData) {
+          await saveAITrainingData('case_rejected', {
+            caseId: current.id,
+            caseInfo: {
+              title: current.data.title,
+              content: current.data.content,
+              excerpt: current.data.excerpt
+            },
+            rejectionMethod: 'swipe_left',
+            rejectedAt: new Date().toISOString()
+          });
+        }
+        
+        // Firestore에서 삭제
+        await deleteDoc(doc(db, 'cases', current.id));
+      } catch (error) {
+        console.error('삭제 실패:', error);
+      }
+      
+      setTimeout(() => {
+        window.reviewIndex++;
+        window.refreshCount = 0;
+        window.reviewStartTime = Date.now();
+        showReviewCard();
+      }, 400);
+    }
+    
+    // 우측 스와이프: 보류 (맨 뒤로)
+    function swipeRight() {
+      const card = document.getElementById('current-review-card');
+      card.classList.add('swipe-out-right');
+      
+      showToast('보류되었습니다 (맨 뒤로 이동)', 'info');
+      
+      const current = window.reviewQueue[window.reviewIndex];
+      window.reviewQueue.push(current);  // 맨 뒤에 추가
+      
+      setTimeout(() => {
+        window.reviewIndex++;
+        window.refreshCount = 0;
+        window.reviewStartTime = Date.now();
+        showReviewCard();
+      }, 400);
     }
 
-    window.selectOption = function(option) {
-      // TODO: 옵션 선택 로직
+    window.selectOption = async function(option) {
       const card = document.getElementById('current-review-card');
-      card.classList.add('slide-out-down');
+      if (!card) return;
+      
+      card.style.transform = 'scale(0.9)';
+      card.style.opacity = '0';
+      card.style.transition = 'all 0.3s';
+      
+      const current = window.reviewQueue[window.reviewIndex];
+      if (!current) return;
+      
+      const startTime = window.reviewStartTime || Date.now();
+      const timeSpent = (Date.now() - startTime) / 1000;
+      
+      // AI 학습 데이터 저장
+      if (window.saveAITrainingData) {
+        await saveAITrainingData('review', {
+          caseId: current.id,
+          caseInfo: {
+            title: current.data.title || '',
+            content: current.data.content || '',
+            excerpt: current.data.excerpt || '',
+            source: current.data.source || ''
+          },
+          originalPrediction: {
+            actor: current.data.actor || {},
+            teamType: current.data.teamType || {},
+            primaryCategory: current.data.primaryCategory || {}
+          },
+          humanReview: {
+            optionSelected: option,
+            refreshCount: window.refreshCount || 0,
+            timeSpent: timeSpent,
+            reviewedAt: new Date().toISOString()
+          },
+          reasoning: current.data.classificationReason || {},
+          status: current.data.status || ''
+        });
+      }
       
       showToast(`${option}안이 선택되었습니다`, 'success');
       
       setTimeout(() => {
         window.reviewIndex++;
         window.refreshCount = 0;
+        window.reviewStartTime = Date.now();
         showReviewCard();
       }, 300);
     };
@@ -2252,7 +2634,6 @@ const firebaseConfig = {
       
       window.refreshCount++;
       showToast('새 옵션을 생성하고 있습니다...', 'info');
-      // TODO: AI로 새 옵션 생성
       showReviewCard();
     };
 
