@@ -1692,27 +1692,11 @@ body.dark-mode .option-chip:hover {
   </div>
 
   <div id="review-container" class="review-container">
-  <!-- 좌측 화살표 (PC용) -->
-  <button class="swipe-arrow left" onclick="arrowSwipeLeft()" aria-label="삭제">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <polyline points="15 18 9 12 15 6"></polyline>
-    </svg>
-    <div class="arrow-label">삭제</div>
-  </button>
-  
-  <!-- 우측 화살표 (PC용) -->
-  <button class="swipe-arrow right" onclick="arrowSwipeRight()" aria-label="보류">
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-    <div class="arrow-label">보류</div>
-  </button>
-  
-  <div class="loading">
-    <div class="loading-spinner"></div>
-    <div>검토 케이스 로딩 중...</div>
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div>검토 케이스 로딩 중...</div>
+    </div>
   </div>
-</div>
   
   <!-- 스와이프 가이드 -->
   <div id="swipe-guide" class="swipe-guide" style="display: none;">
@@ -2334,65 +2318,12 @@ const firebaseConfig = {
         window.reviewStartTime = Date.now();
         showReviewCard();
         
-        // 스와이프 가이드 표시 (기기별 다르게, 1초만)
-        const isMobile = /Mobile|Android|iPhone/i.test(navigator.userAgent);
-        const guideElement = document.getElementById('swipe-guide');
-        
-        if (isMobile) {
-          // 모바일: 스와이프 가이드
-          guideElement.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div style="text-align: left;">
-                <div style="font-size: 24px; margin-bottom: 4px;">👈</div>
-                <div style="font-size: 12px; font-weight: 600;">삭제</div>
-              </div>
-              <div style="text-align: center; color: var(--text-secondary);">
-                <div style="font-size: 14px;">← 스와이프 →</div>
-              </div>
-              <div style="text-align: right;">
-                <div style="font-size: 24px; margin-bottom: 4px;">👉</div>
-                <div style="font-size: 12px; font-weight: 600;">보류</div>
-              </div>
-            </div>
-          `;
-        } else {
-          // PC: 키보드 가이드
-          guideElement.innerHTML = `
-            <div style="text-align: center;">
-              <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
-                좌우 화살표 버튼을 클릭하거나 키보드 방향키를 사용하세요
-              </div>
-              <div style="display: flex; gap: 16px; justify-content: center; font-size: 12px;">
-                <div>
-                  <kbd style="padding: 4px 8px; background: var(--bg-primary); border-radius: 4px; border: 1px solid var(--border-color);">←</kbd>
-                  <span style="margin-left: 6px; color: #C62828;">삭제</span>
-                </div>
-                <div>
-                  <kbd style="padding: 4px 8px; background: var(--bg-primary); border-radius: 4px; border: 1px solid var(--border-color);">→</kbd>
-                  <span style="margin-left: 6px; color: #FF6B35;">보류</span>
-                </div>
-                <div>
-                  <kbd style="padding: 4px 8px; background: var(--bg-primary); border-radius: 4px; border: 1px solid var(--border-color);">Space</kbd>
-                  <span style="margin-left: 6px;">더보기</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-        
-        // 1초만 표시하고 페이드아웃
-        guideElement.style.display = 'block';
-        guideElement.style.opacity = '1';
-        guideElement.style.transition = 'opacity 0.3s';
-        
-        setTimeout(() => {
-          guideElement.style.opacity = '0';
-          setTimeout(() => {
-            guideElement.style.display = 'none';
-          }, 300);
-        }, 1000);
-        
+        // 스와이프 가이드 표시
+        document.getElementById('swipe-guide').style.display = 'block';
       } catch (error) {
+        handleError('검토 데이터를 불러오는데 실패했습니다', error);
+      }
+    }
 
     function showReviewCard() {
       if (window.reviewIndex >= window.reviewQueue.length) {
@@ -2507,88 +2438,6 @@ const firebaseConfig = {
         text.textContent = '접기';
       }
     };
-
-   // 화살표 버튼으로 스와이프 (PC용)
-    window.arrowSwipeLeft = function() {
-      const card = document.getElementById('current-review-card');
-      if (!card) return;
-      
-      card.classList.add('swipe-out-left');
-      swipeLeft();
-    };
-    
-    window.arrowSwipeRight = function() {
-      const card = document.getElementById('current-review-card');
-      if (!card) return;
-      
-      card.classList.add('swipe-out-right');
-      swipeRight();
-    };
-    
-    // 키보드 단축키 추가 (PC 편의성)
-    document.addEventListener('keydown', function(e) {
-      // 검토 탭이 활성화되어 있을 때만
-      if (!document.getElementById('review-content').classList.contains('active')) return;
-      if (!document.getElementById('current-review-card')) return;
-      
-      // 좌측 화살표 또는 Delete 키: 삭제
-      if (e.key === 'ArrowLeft' || e.key === 'Delete') {
-        e.preventDefault();
-        arrowSwipeLeft();
-      }
-      // 우측 화살표: 보류
-      else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        arrowSwipeRight();
-      }
-      // 스페이스바: 더보기/접기
-      else if (e.key === ' ' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
-        const expandBtn = document.querySelector('.expand-button');
-        if (expandBtn) expandBtn.click();
-      }
-    }); 
-
-       // 화살표 버튼으로 스와이프 (PC용)
-    window.arrowSwipeLeft = function() {
-      const card = document.getElementById('current-review-card');
-      if (!card) return;
-      
-      card.classList.add('swipe-out-left');
-      swipeLeft();
-    };
-    
-    window.arrowSwipeRight = function() {
-      const card = document.getElementById('current-review-card');
-      if (!card) return;
-      
-      card.classList.add('swipe-out-right');
-      swipeRight();
-    };
-    
-    // 키보드 단축키 추가 (PC 편의성)
-    document.addEventListener('keydown', function(e) {
-      // 검토 탭이 활성화되어 있을 때만
-      if (!document.getElementById('review-content').classList.contains('active')) return;
-      if (!document.getElementById('current-review-card')) return;
-      
-      // 좌측 화살표 또는 Delete 키: 삭제
-      if (e.key === 'ArrowLeft' || e.key === 'Delete') {
-        e.preventDefault();
-        arrowSwipeLeft();
-      }
-      // 우측 화살표: 보류
-      else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        arrowSwipeRight();
-      }
-      // 스페이스바: 더보기/접기
-      else if (e.key === ' ' && e.target.tagName !== 'BUTTON') {
-        e.preventDefault();
-        const expandBtn = document.querySelector('.expand-button');
-        if (expandBtn) expandBtn.click();
-      }
-    });
     
     // 스와이프 초기화
     function initSwipe() {
