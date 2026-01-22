@@ -802,97 +802,105 @@
     }
 
     /* ================== 편집 탭 스타일 ================== */
-    .edit-section {
-      background: var(--bg-secondary);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px var(--card-shadow);
-    }
+/* ================== 편집 탭 스타일 ================== */
+.edit-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px var(--card-shadow);
+}
 
-    .category-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.edit-section .section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
 
-    .category-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      background: var(--bg-primary);
-      border-radius: 8px;
-      transition: all 0.2s;
-    }
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .category-item:hover {
-      background: var(--border-color);
-    }
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
 
-    .category-info {
-      flex: 1;
-    }
+.category-item:hover {
+  background: var(--border-color);
+}
 
-    .category-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
+.category-info {
+  flex: 1;
+}
 
-    .category-keywords {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
+.category-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
 
-    .category-actions {
-      display: flex;
-      gap: 8px;
-    }
+.category-keywords {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
 
-    .icon-button {
-      width: 36px;
-      height: 36px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      font-size: 16px;
-    }
+.category-actions {
+  display: flex;
+  gap: 8px;
+}
 
-    .icon-button.edit {
-      background: #E3F2FD;
-      color: #1565C0;
-    }
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 16px;
+}
 
-    .icon-button.delete {
-      background: #FFEBEE;
-      color: #C62828;
-    }
+.icon-button.edit {
+  background: #E3F2FD;
+  color: #1565C0;
+}
 
-    .icon-button:hover {
-      transform: scale(1.1);
-    }
+.icon-button.delete {
+  background: #FFEBEE;
+  color: #C62828;
+}
 
-    .add-category-form {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
+.icon-button:hover {
+  transform: scale(1.1);
+}
 
-    .add-category-input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-size: 14px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-    }
+.add-category-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.add-category-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
 
     /* ================== 로그 탭 스타일 ================== */
     .log-filters {
@@ -1175,6 +1183,35 @@
 
       .content-title {
         font-size: 24px;
+          .edit-section {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .category-item {
+    padding: 10px;
+  }
+
+  .category-name {
+    font-size: 15px;
+  }
+
+  .category-keywords {
+    font-size: 12px;
+  }
+
+  .icon-button {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .add-category-form {
+    flex-direction: column;
+  }
+
+  .add-category-input {
+    width: 100%;
       }
 
       .stats-grid {
