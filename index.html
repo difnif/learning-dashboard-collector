@@ -3320,16 +3320,6 @@ window.exportAITrainingData = async function() {
     
     // 페이지 로드 시 검토 시작 시간 기록
     window.reviewStartTime = Date.now();
-
-    // 모달 외부 클릭 시 닫기
-    document.getElementById('case-modal').addEventListener('click', function(e) {
-      if (e.target === this) {
-        closeModal();
-      }
-    });
-  </script>
-</body>
-</html>
     
     // 모달 외부 클릭 시 닫기
     document.getElementById('case-modal').addEventListener('click', function(e) {
