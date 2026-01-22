@@ -37,14 +37,21 @@
       --accent-color: #FF6B35;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      padding-bottom: 80px;
-      overflow-x: hidden;
-      transition: background 0.3s, color 0.3s;
-    }
+    html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding-bottom: 80px;
+  transition: background 0.3s, color 0.3s;
+  margin: 0;
+  width: 100%;
+}
 
     /* ================== 테마 토글 버튼 ================== */
     .theme-toggle {
@@ -77,19 +84,35 @@
 
     /* ================== 하단 탭 네비게이션 ================== */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-end;
-      height: 70px;
-      z-index: 1000;
-      box-shadow: 0 -2px 10px var(--card-shadow);
-    }
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 70px;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px var(--card-shadow);
+  width: 100%;
+  max-width: 100vw;
+}
+```
+
+---
+
+## 🎯 핵심 수정 사항
+```
+✅ html, body에 overflow-x: hidden 추가
+✅ .content에 width: 100%, box-sizing: border-box 추가
+✅ input에 min-width: 0 추가 (flex 아이템 넘침 방지)
+✅ 모바일에서 폼을 완전히 세로 배치
+✅ 유형 병합 섹션도 모바일에서 세로 배치
+✅ 버튼을 flex-shrink: 0으로 고정
+✅ 하단 탭에 max-width: 100vw 추가
+✅ 480px 이하에서 추가 최적화
 
     .tab-button {
       flex: 1;
@@ -157,12 +180,15 @@
 
     /* ================== 메인 컨텐츠 ================== */
     .content {
-      display: none;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      animation: fadeIn 0.3s;
-    }
+  display: none;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
 
     .content.active {
       display: block;
@@ -803,12 +829,23 @@
 
     /* ================== 편집 탭 스타일 ================== */
 /* ================== 편집 탭 스타일 ================== */
-.edit-section {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px var(--card-shadow);
+/* 유형 병합 컨테이너 */
+.edit-section > div[style*="display: flex"] {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.edit-section .search-select {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.edit-section .btn-primary {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .edit-section .section-title {
@@ -890,16 +927,24 @@
   display: flex;
   gap: 8px;
   margin-top: 12px;
+  flex-wrap: wrap;
 }
 
 .add-category-input {
   flex: 1;
+  min-width: 0;
   padding: 12px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
   background: var(--bg-secondary);
   color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.add-category-form .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
     /* ================== 로그 탭 스타일 ================== */
@@ -1176,16 +1221,23 @@
     }
 
     /* ================== 반응형 ================== */
-    @media (max-width: 768px) {
-      .content {
-        padding: 16px;
-      }
+  @media (max-width: 768px) {
+  .content {
+    padding: 12px;
+    width: 100%;
+    overflow-x: hidden;
+  }
 
-      .content-title {
-        font-size: 24px;
-          .edit-section {
+  .content-title {
+    font-size: 24px;
+  }
+
+  /* 편집 탭 모바일 최적화 */
+  .edit-section {
     padding: 12px;
     margin-bottom: 12px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .category-item {
@@ -1206,53 +1258,94 @@
     font-size: 14px;
   }
 
+  /* 카테고리 추가 폼 - 세로 배치 */
   .add-category-form {
     flex-direction: column;
+    gap: 8px;
+    width: 100%;
   }
 
   .add-category-input {
     width: 100%;
-      }
+    flex: none;
+    min-width: auto;
+  }
 
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+  .add-category-form .btn {
+    width: 100%;
+  }
 
-      .topic-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+  /* 유형 병합 - 세로 배치 */
+  .edit-section > div[style*="display: flex"] {
+    flex-direction: column;
+    gap: 8px;
+  }
 
-      .review-card {
-        max-width: 100%;
-      }
+  .edit-section > div[style*="display: flex"] > span {
+    display: none; /* 화살표 숨김 */
+  }
 
-      .theme-toggle {
-        top: 15px;
-        right: 15px;
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-      }
-    }
+  .edit-section .search-select {
+    width: 100%;
+    flex: none;
+  }
 
-    @media (max-width: 480px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+  .edit-section .btn-primary {
+    width: 100%;
+  }
 
-      .modal-content {
-        padding: 16px;
-        margin: 10px;
-      }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-      .review-options {
-        flex-direction: column;
-      }
+  .topic-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-      .option-chip {
-        width: 100%;
-      }
-    }
+  .review-card {
+    max-width: 100%;
+  }
+
+  .theme-toggle {
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 8px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    padding: 16px;
+    margin: 10px;
+  }
+
+  .review-options {
+    flex-direction: column;
+  }
+
+  .option-chip {
+    width: 100%;
+  }
+
+  /* 편집 탭 초소형 모바일 */
+  .edit-section {
+    padding: 8px;
+  }
+
+  .category-item {
+    padding: 8px;
+  }
+}
   </style>
 </head>
 <body>
