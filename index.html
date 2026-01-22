@@ -2733,7 +2733,215 @@ window.exportAITrainingData = async function() {
     handleError('내보내기 실패', error);
   }
 };
-  
+
+// ==================== AI 학습 데이터 자동 저장 ====================
+    
+    // AI 학습용 데이터 저장 함수
+    async function saveAITrainingData(type, data) {
+      try {
+        const aiTrainingRef = collection(db, 'ai_training');
+        
+        const trainingDoc = {
+          timestamp: new Date().toISOString(),
+          type: type,
+          data: data,
+          metadata: {
+            userAgent: navigator.userAgent,
+            deviceType: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+            screenSize: `${window.screen.width}x${window.screen.height}`
+          }
+        };
+        
+        const docRef = await addDoc(aiTrainingRef, trainingDoc);
+        console.log('✅ AI 학습 데이터 저장 성공:', type, docRef.id);
+        return docRef;
+      } catch (error) {
+        console.error('❌ AI 학습 데이터 저장 실패:', error);
+        // 에러가 나도 사용자 경험에 영향 없도록 조용히 처리
+        return null;
+      }
+    }
+    
+    // 테스트 함수 - 버튼으로 바로 테스트
+    window.testAIDataSave = async function() {
+      showToast('테스트 데이터 저장 중...', 'info');
+      
+      const testData = {
+        testCase: 'test_case_' + Date.now(),
+        message: 'AI 학습 데이터 저장 테스트',
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await saveAITrainingData('test', testData);
+      
+      if (result) {
+        showToast('✅ 테스트 성공! Firebase Console에서 ai_training 컬렉션 확인하세요', 'success');
+        console.log('Firebase Console 확인:', 'https://console.firebase.google.com/project/' + db.app.options.projectId + '/firestore/data/ai_training');
+      } else {
+        showToast('❌ 테스트 실패! 콘솔(F12)에서 에러 확인하세요', 'error');
+      }
+    };
+    
+    // AI 학습 데이터 내보내기
+    window.exportAITrainingData = async function() {
+      try {
+        showToast('AI 학습 데이터를 가져오는 중...', 'info');
+        
+        const aiTrainingRef = collection(db, 'ai_training');
+        const q = query(aiTrainingRef, orderBy('timestamp', 'desc'));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+          showToast('저장된 학습 데이터가 없습니다', 'error');
+          return;
+        }
+        
+        const trainingData = {
+          exportDate: new Date().toISOString(),
+          totalRecords: snapshot.size,
+          data: []
+        };
+        
+        snapshot.forEach(doc => {
+          trainingData.data.push({
+            id: doc.id,
+            ...doc.data()
+          });
+        });
+        
+        // 타입별 통계
+        const stats = {};
+        trainingData.data.forEach(item => {
+          stats[item.type] = (stats[item.type] || 0) + 1;
+        });
+        trainingData.statistics = stats;
+        
+        const jsonStr = JSON.stringify(trainingData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ai-training-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast(`${trainingData.totalRecords}개의 학습 데이터를 다운로드했습니다`, 'success');
+        console.log('내보낸 데이터 통계:', stats);
+      } catch (error) {
+        handleError('내보내기 실패', error);
+      }
+    };
+    
+    // 검토 완료 시 AI 학습 데이터 저장 (기존 selectOption 함수 찾아서 교체)
+    window.selectOption = async function(option) {
+      const card = document.getElementById('current-review-card');
+      if (!card) return;
+      
+      card.classList.add('slide-out-down');
+      
+      const current = window.reviewQueue[window.reviewIndex];
+      if (!current) return;
+      
+      const startTime = window.reviewStartTime || Date.now();
+      const timeSpent = (Date.now() - startTime) / 1000;
+      
+      // AI 학습 데이터 저장
+      await saveAITrainingData('review', {
+        caseId: current.id,
+        caseInfo: {
+          title: current.data.title || '',
+          content: current.data.content || '',
+          excerpt: current.data.excerpt || '',
+          source: current.data.source || ''
+        },
+        originalPrediction: {
+          actor: current.data.actor || {},
+          teamType: current.data.teamType || {},
+          primaryCategory: current.data.primaryCategory || {}
+        },
+        humanReview: {
+          optionSelected: option,
+          refreshCount: window.refreshCount || 0,
+          timeSpent: timeSpent,
+          reviewedAt: new Date().toISOString()
+        },
+        reasoning: current.data.classificationReason || {},
+        status: current.data.status || ''
+      });
+      
+      showToast(`${option}안이 선택되었습니다`, 'success');
+      
+      setTimeout(() => {
+        window.reviewIndex++;
+        window.refreshCount = 0;
+        window.reviewStartTime = Date.now();
+        showReviewCard();
+      }, 300);
+    };
+    
+    // 케이스 삭제 시 AI 학습 데이터 저장 (기존 deleteCase 함수 찾아서 교체)
+    window.deleteCase = async function() {
+      if (!confirm('정말 이 케이스를 삭제하시겠습니까?')) return;
+      
+      try {
+        const docRef = doc(db, 'cases', window.currentCaseId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const caseData = docSnap.data();
+          
+          // 삭제된 케이스 정보를 부정 샘플로 저장
+          await saveAITrainingData('case_rejected', {
+            caseId: window.currentCaseId,
+            caseInfo: {
+              title: caseData.title || '',
+              content: caseData.content || '',
+              excerpt: caseData.excerpt || ''
+            },
+            classification: {
+              actor: caseData.actor || {},
+              teamType: caseData.teamType || {},
+              primaryCategory: caseData.primaryCategory || {}
+            },
+            reasoning: caseData.classificationReason || {},
+            rejectedAt: new Date().toISOString(),
+            rejectionReason: '사용자가 케이스 삭제'
+          });
+        }
+        
+        await deleteDoc(docRef);
+        
+        await addDoc(collection(db, 'logs'), {
+          action: 'delete',
+          caseId: window.currentCaseId,
+          timestamp: new Date().toISOString()
+        });
+        
+        invalidateCache();
+        closeModal();
+        loadDBTab();
+        showToast('케이스가 삭제되었습니다', 'success');
+      } catch (error) {
+        handleError('삭제에 실패했습니다', error);
+      }
+    };
+    
+    // 페이지 로드 시 검토 시작 시간 기록
+    window.reviewStartTime = Date.now();
+
+    // 모달 외부 클릭 시 닫기
+    document.getElementById('case-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
+    
     // 모달 외부 클릭 시 닫기
     document.getElementById('case-modal').addEventListener('click', function(e) {
       if (e.target === this) {
