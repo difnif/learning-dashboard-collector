@@ -2694,6 +2694,46 @@ const firebaseConfig = {
       }
     });
 
+    // AI 학습 데이터 내보내기 (필요할 때만 사용)
+window.exportAITrainingData = async function() {
+  try {
+    showToast('AI 학습 데이터를 가져오는 중...', 'info');
+    
+    const aiTrainingRef = collection(db, 'ai_training');
+    const q = query(aiTrainingRef, orderBy('timestamp', 'desc'));
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.empty) {
+      showToast('저장된 학습 데이터가 없습니다', 'error');
+      return;
+    }
+    
+    const trainingData = [];
+    snapshot.forEach(doc => {
+      trainingData.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    const jsonStr = JSON.stringify(trainingData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ai-training-data-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast(`${trainingData.length}개의 학습 데이터를 다운로드했습니다`, 'success');
+  } catch (error) {
+    handleError('내보내기 실패', error);
+  }
+};
+  
     // 모달 외부 클릭 시 닫기
     document.getElementById('case-modal').addEventListener('click', function(e) {
       if (e.target === this) {
