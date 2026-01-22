@@ -1166,6 +1166,14 @@ body {
 </head>
 <body>
 
+  <!-- 테마 토글 버튼 -->
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="테마 변경">
+    <span id="theme-icon">☀️</span>
+  </button>
+
+  <!-- DB 탭 컨텐츠 -->
+  <div id="db-content" class="content">
+
   <!-- DB 탭 컨텐츠 -->
   <div id="db-content" class="content">
     <div class="content-header">
@@ -2249,8 +2257,42 @@ body {
       return labels[action] || action;
     }
 
+// ==================== 테마 토글 ====================
+    window.toggleTheme = function() {
+      const body = document.body;
+      const icon = document.getElementById('theme-icon');
+      
+      body.classList.toggle('dark-mode');
+      
+      if (body.classList.contains('dark-mode')) {
+        icon.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        icon.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      }
+    };
+    
+    function loadTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const icon = document.getElementById('theme-icon');
+      
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        icon.textContent = '🌙';
+      } else {
+        icon.textContent = '☀️';
+      }
+    }
+
     // ==================== 초기화 ====================
     window.addEventListener('DOMContentLoaded', () => {
+        // 테마 로드
+  loadTheme();
+  
+  // 마지막 탭 복원 또는 기본 탭 (보드)
+  const lastTab = localStorage.getItem('lastTab') || 'board';
+
       // 마지막 탭 복원 또는 기본 탭 (보드)
       const lastTab = localStorage.getItem('lastTab') || 'board';
       
