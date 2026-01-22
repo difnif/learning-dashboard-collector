@@ -83,7 +83,8 @@ body {
     }
 
     /* ================== 하단 탭 네비게이션 ================== */
-    .bottom-nav {
+    /* ================== 하단 탭 네비게이션 ================== */
+.bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
@@ -100,7 +101,84 @@ body {
   max-width: 100vw;
 }
 
-    /* 다크모드 전용 탭 스타일 추가 */
+.tab-button {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  height: 60px;
+}
+
+.tab-button.board {
+  height: 80px;
+  margin-bottom: 10px;
+  background: #FF6B35;
+  border-radius: 50%;
+  width: 70px;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.tab-button.board .tab-icon {
+  margin-bottom: 0;
+}
+
+.tab-button.board .tab-label {
+  display: none;
+}
+
+.tab-button.board.active {
+  background: #E85A2B;
+  transform: scale(1.05);
+}
+
+.tab-icon {
+  margin-bottom: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-icon svg {
+  transition: all 0.2s;
+}
+
+.tab-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.tab-button.active .tab-label {
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.tab-button.active .tab-icon svg {
+  stroke: #FF6B35;
+  transform: scale(1.1);
+}
+
+.tab-button .tab-icon svg {
+  stroke: #666;
+}
+
+.tab-button.board .tab-icon svg {
+  stroke: white;
+}
+
+.tab-button.board .tab-label {
+  color: white;
+}
+
+/* 다크모드 전용 탭 스타일 */
 body.dark-mode .bottom-nav {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border-color);
@@ -110,17 +188,18 @@ body.dark-mode .tab-button {
   color: var(--text-secondary);
 }
 
-body.dark-mode .tab-icon {
-  filter: brightness(0.9);
+body.dark-mode .tab-icon svg {
+  stroke: var(--text-secondary);
+  opacity: 0.7;
 }
 
 body.dark-mode .tab-label {
   color: var(--text-secondary);
 }
 
-body.dark-mode .tab-button.active .tab-icon {
-  color: #FF6B35;
-  filter: brightness(1);
+body.dark-mode .tab-button.active .tab-icon svg {
+  stroke: #FF6B35;
+  opacity: 1;
 }
 
 body.dark-mode .tab-button.active .tab-label {
@@ -132,21 +211,15 @@ body.dark-mode .tab-button.board {
   box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
 }
 
+body.dark-mode .tab-button.board .tab-icon svg {
+  stroke: white;
+  opacity: 1;
+}
+
 body.dark-mode .tab-button.board.active {
   background: #E85A2B;
 }
-    
-## 🎯 핵심 수정 사항
 ```
-✅ html, body에 overflow-x: hidden 추가
-✅ .content에 width: 100%, box-sizing: border-box 추가
-✅ input에 min-width: 0 추가 (flex 아이템 넘침 방지)
-✅ 모바일에서 폼을 완전히 세로 배치
-✅ 유형 병합 섹션도 모바일에서 세로 배치
-✅ 버튼을 flex-shrink: 0으로 고정
-✅ 하단 탭에 max-width: 100vw 추가
-✅ 480px 이하에서 추가 최적화
-
     .tab-button {
       flex: 1;
       display: flex;
