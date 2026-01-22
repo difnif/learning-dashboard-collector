@@ -5,117 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>팀플 유형 학습 시스템</title>
   <style>
-    /* ================== 다크모드/라이트모드 ================== */
-:root {
-  /* 라이트 모드 색상 */
-  --bg-primary: #f5f5f5;
-  --bg-secondary: #ffffff;
-  --text-primary: #222;
-  --text-secondary: #666;
-  --text-tertiary: #999;
-  --border-color: #e0e0e0;
-  --card-shadow: rgba(0,0,0,0.05);
-  --accent-color: #FF6B35;
-}
-
-body.dark-mode {
-  /* 다크 모드 색상 */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --text-tertiary: #808080;
-  --border-color: #404040;
-  --card-shadow: rgba(0,0,0,0.3);
-  --accent-color: #FF6B35;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
-  background: var(--bg-primary);
-  padding-bottom: 80px;
-  overflow-x: hidden;
-  transition: background 0.3s, color 0.3s;
-}
-
-.section {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px var(--card-shadow);
-}
-
-.content-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
-.content-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.case-card {
-  border-color: var(--border-color);
-}
-
-.case-card:hover {
-  border-color: var(--accent-color);
-}
-
-/* 테마 토글 버튼 */
-.theme-toggle {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  transition: all 0.3s;
-  z-index: 1001;
-  box-shadow: 0 2px 8px var(--card-shadow);
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px var(--card-shadow);
-}
-
-.theme-toggle:active {
-  transform: scale(0.95);
-}
-
-@media (max-width: 768px) {
-  .theme-toggle {
-    top: 15px;
-    right: 15px;
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
-  }
-}
+    /* ================== 기본 리셋 ================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    /* ================== 다크모드/라이트모드 ================== */
+    :root {
+      /* 라이트 모드 색상 */
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --text-primary: #222;
+      --text-secondary: #666;
+      --text-tertiary: #999;
+      --border-color: #e0e0e0;
+      --card-shadow: rgba(0,0,0,0.05);
+      --accent-color: #FF6B35;
+    }
+
+    body.dark-mode {
+      /* 다크 모드 색상 */
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #e0e0e0;
+      --text-secondary: #b0b0b0;
+      --text-tertiary: #808080;
+      --border-color: #404040;
+      --card-shadow: rgba(0,0,0,0.3);
+      --accent-color: #FF6B35;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
-      background: #f5f5f5;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       padding-bottom: 80px;
       overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ================== 테마 토글 버튼 ================== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.3s;
+      z-index: 1001;
+      box-shadow: 0 2px 8px var(--card-shadow);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px var(--card-shadow);
+    }
+
+    .theme-toggle:active {
+      transform: scale(0.95);
     }
 
     /* ================== 하단 탭 네비게이션 ================== */
@@ -124,14 +81,14 @@ body {
       bottom: 0;
       left: 0;
       right: 0;
-      background: white;
-      border-top: 1px solid #e0e0e0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
       display: flex;
       justify-content: space-around;
       align-items: flex-end;
       height: 70px;
       z-index: 1000;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 -2px 10px var(--card-shadow);
     }
 
     .tab-button {
@@ -179,7 +136,7 @@ body {
 
     .tab-label {
       font-size: 11px;
-      color: #666;
+      color: var(--text-secondary);
       transition: all 0.2s;
     }
 
@@ -223,22 +180,22 @@ body {
     .content-title {
       font-size: 28px;
       font-weight: 700;
-      color: #222;
+      color: var(--text-primary);
       margin-bottom: 8px;
     }
 
     .content-subtitle {
       font-size: 14px;
-      color: #666;
+      color: var(--text-secondary);
     }
 
     /* ================== 공통 컴포넌트 ================== */
     .section {
-      background: white;
+      background: var(--bg-secondary);
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px var(--card-shadow);
     }
 
     .section-header {
@@ -251,7 +208,7 @@ body {
     .section-title {
       font-size: 18px;
       font-weight: 700;
-      color: #222;
+      color: var(--text-primary);
     }
 
     .more-button {
@@ -313,9 +270,39 @@ body {
       background: #FFCDD2;
     }
 
+    /* ================== Toast 알림 ================== */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px var(--card-shadow);
+      z-index: 2001;
+      animation: slideUp 0.3s;
+    }
+
+    .toast.error {
+      background: #C62828;
+      color: white;
+    }
+
+    .toast.success {
+      background: #2E7D32;
+      color: white;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translate(-50%, 20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
     /* ================== DB 탭 스타일 ================== */
     .case-card {
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 12px;
@@ -332,7 +319,7 @@ body {
     .case-title {
       font-size: 16px;
       font-weight: 600;
-      color: #222;
+      color: var(--text-primary);
       margin-bottom: 8px;
       line-height: 1.4;
     }
@@ -370,6 +357,27 @@ body {
       color: #7B1FA2;
     }
 
+    /* 다크모드용 배지 */
+    body.dark-mode .meta-badge.actor {
+      background: rgba(245, 124, 0, 0.2);
+      color: #FFB74D;
+    }
+
+    body.dark-mode .meta-badge.type {
+      background: rgba(46, 125, 50, 0.2);
+      color: #81C784;
+    }
+
+    body.dark-mode .meta-badge.source {
+      background: rgba(21, 101, 192, 0.2);
+      color: #64B5F6;
+    }
+
+    body.dark-mode .meta-badge.date {
+      background: rgba(123, 31, 162, 0.2);
+      color: #BA68C8;
+    }
+
     /* 핫 플레이어 */
     .hot-player-list {
       display: flex;
@@ -381,7 +389,7 @@ body {
       display: flex;
       align-items: center;
       padding: 12px;
-      background: #f8f8f8;
+      background: var(--bg-primary);
       border-radius: 8px;
       transition: all 0.2s;
     }
@@ -390,6 +398,10 @@ body {
       background: #FFF3E0;
       cursor: pointer;
       transform: translateX(4px);
+    }
+
+    body.dark-mode .hot-player-item:hover {
+      background: rgba(245, 124, 0, 0.2);
     }
 
     .hot-player-rank {
@@ -404,13 +416,13 @@ body {
       flex: 1;
       font-size: 15px;
       font-weight: 600;
-      color: #222;
+      color: var(--text-primary);
     }
 
     .hot-player-count {
       font-size: 14px;
-      color: #666;
-      background: white;
+      color: var(--text-secondary);
+      background: var(--bg-secondary);
       padding: 4px 12px;
       border-radius: 12px;
     }
@@ -467,7 +479,7 @@ body {
     .type-bubble {
       padding: 12px 24px;
       border-radius: 24px;
-      background: white;
+      background: var(--bg-secondary);
       border: 2px solid #FF6B35;
       color: #FF6B35;
       font-weight: 600;
@@ -497,19 +509,22 @@ body {
 
     .search-select {
       padding: 10px 16px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 14px;
-      background: white;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
       cursor: pointer;
     }
 
     .search-input {
       flex: 1;
       padding: 10px 16px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 14px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
 
     .search-button {
@@ -533,9 +548,9 @@ body {
     }
 
     .review-card {
-      background: white;
+      background: var(--bg-secondary);
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px var(--card-shadow);
       max-width: 600px;
       width: 100%;
       overflow: hidden;
@@ -568,7 +583,7 @@ body {
 
     .review-card-header {
       padding: 20px;
-      border-bottom: 2px solid #f0f0f0;
+      border-bottom: 2px solid var(--border-color);
     }
 
     .review-type-badge {
@@ -601,7 +616,7 @@ body {
     .review-card-title {
       font-size: 18px;
       font-weight: 700;
-      color: #222;
+      color: var(--text-primary);
       line-height: 1.4;
       margin-bottom: 8px;
     }
@@ -617,7 +632,7 @@ body {
     .review-label {
       font-size: 12px;
       font-weight: 600;
-      color: #666;
+      color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 8px;
@@ -626,8 +641,8 @@ body {
     .review-content {
       font-size: 14px;
       line-height: 1.6;
-      color: #333;
-      background: #f8f8f8;
+      color: var(--text-primary);
+      background: var(--bg-primary);
       padding: 12px;
       border-radius: 8px;
     }
@@ -638,17 +653,23 @@ body {
       padding: 12px;
       font-style: italic;
       margin: 12px 0;
+      color: var(--text-primary);
+    }
+
+    body.dark-mode .review-excerpt {
+      background: rgba(255, 107, 53, 0.1);
     }
 
     .review-options {
       display: flex;
       gap: 8px;
       margin-top: 12px;
+      flex-wrap: wrap;
     }
 
     .option-chip {
       padding: 8px 16px;
-      background: #f0f0f0;
+      background: var(--bg-primary);
       border: 2px solid transparent;
       border-radius: 20px;
       font-size: 14px;
@@ -661,9 +682,13 @@ body {
       background: #FFF3E0;
     }
 
+    body.dark-mode .option-chip:hover {
+      background: rgba(255, 107, 53, 0.2);
+    }
+
     .review-card-footer {
       padding: 20px;
-      background: #fafafa;
+      background: var(--bg-primary);
       display: flex;
       gap: 8px;
     }
@@ -756,10 +781,10 @@ body {
     }
 
     .stat-card {
-      background: white;
+      background: var(--bg-secondary);
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px var(--card-shadow);
       text-align: center;
     }
 
@@ -772,23 +797,17 @@ body {
 
     .stat-label {
       font-size: 14px;
-      color: #666;
+      color: var(--text-secondary);
       font-weight: 600;
-    }
-
-    .chart-container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     /* ================== 편집 탭 스타일 ================== */
     .edit-section {
-      background: white;
+      background: var(--bg-secondary);
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 20px;
+      box-shadow: 0 2px 8px var(--card-shadow);
     }
 
     .category-list {
@@ -802,13 +821,13 @@ body {
       align-items: center;
       justify-content: space-between;
       padding: 16px;
-      background: #f8f8f8;
+      background: var(--bg-primary);
       border-radius: 8px;
       transition: all 0.2s;
     }
 
     .category-item:hover {
-      background: #f0f0f0;
+      background: var(--border-color);
     }
 
     .category-info {
@@ -818,13 +837,13 @@ body {
     .category-name {
       font-size: 16px;
       font-weight: 600;
-      color: #222;
+      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
     .category-keywords {
       font-size: 13px;
-      color: #666;
+      color: var(--text-secondary);
     }
 
     .category-actions {
@@ -868,9 +887,11 @@ body {
     .add-category-input {
       flex: 1;
       padding: 12px;
-      border: 1px solid #e0e0e0;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       font-size: 14px;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
 
     /* ================== 로그 탭 스타일 ================== */
@@ -883,7 +904,7 @@ body {
 
     .filter-chip {
       padding: 8px 16px;
-      background: #f0f0f0;
+      background: var(--bg-primary);
       border: 2px solid transparent;
       border-radius: 20px;
       font-size: 14px;
@@ -904,11 +925,11 @@ body {
     }
 
     .log-item {
-      background: white;
+      background: var(--bg-secondary);
       padding: 16px;
       border-radius: 8px;
-      border-left: 4px solid #e0e0e0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--border-color);
+      box-shadow: 0 2px 4px var(--card-shadow);
     }
 
     .log-item.collection {
@@ -933,17 +954,17 @@ body {
     .log-action {
       font-size: 14px;
       font-weight: 600;
-      color: #222;
+      color: var(--text-primary);
     }
 
     .log-time {
       font-size: 12px;
-      color: #999;
+      color: var(--text-tertiary);
     }
 
     .log-details {
       font-size: 13px;
-      color: #666;
+      color: var(--text-secondary);
       line-height: 1.5;
     }
 
@@ -968,7 +989,7 @@ body {
     }
 
     .modal-content {
-      background: white;
+      background: var(--bg-secondary);
       border-radius: 12px;
       padding: 24px;
       max-width: 800px;
@@ -989,20 +1010,20 @@ body {
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 16px;
-      border-bottom: 2px solid #f0f0f0;
+      border-bottom: 2px solid var(--border-color);
     }
 
     .modal-title {
       font-size: 20px;
       font-weight: 700;
-      color: #222;
+      color: var(--text-primary);
     }
 
     .modal-close {
       background: none;
       border: none;
       font-size: 28px;
-      color: #999;
+      color: var(--text-tertiary);
       cursor: pointer;
       padding: 0;
       width: 32px;
@@ -1011,7 +1032,7 @@ body {
     }
 
     .modal-close:hover {
-      color: #666;
+      color: var(--text-secondary);
     }
 
     .modal-section {
@@ -1021,7 +1042,7 @@ body {
     .modal-section-title {
       font-size: 14px;
       font-weight: 600;
-      color: #666;
+      color: var(--text-secondary);
       margin-bottom: 8px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -1030,7 +1051,7 @@ body {
     .modal-section-content {
       font-size: 15px;
       line-height: 1.6;
-      color: #333;
+      color: var(--text-primary);
     }
 
     .modal-excerpt {
@@ -1040,6 +1061,11 @@ body {
       border-radius: 4px;
       font-style: italic;
       margin: 12px 0;
+      color: var(--text-primary);
+    }
+
+    body.dark-mode .modal-excerpt {
+      background: rgba(255, 107, 53, 0.1);
     }
 
     .modal-actions {
@@ -1108,13 +1134,13 @@ body {
     .loading {
       text-align: center;
       padding: 40px;
-      color: #999;
+      color: var(--text-tertiary);
     }
 
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 4px solid #f0f0f0;
+      border: 4px solid var(--border-color);
       border-top-color: #FF6B35;
       border-radius: 50%;
       animation: spin 1s linear infinite;
@@ -1128,7 +1154,7 @@ body {
     .empty-state {
       text-align: center;
       padding: 60px 20px;
-      color: #999;
+      color: var(--text-tertiary);
     }
 
     .empty-state-icon {
@@ -1162,6 +1188,33 @@ body {
       .review-card {
         max-width: 100%;
       }
+
+      .theme-toggle {
+        top: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 16px;
+        margin: 10px;
+      }
+
+      .review-options {
+        flex-direction: column;
+      }
+
+      .option-chip {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -1171,9 +1224,6 @@ body {
   <button class="theme-toggle" onclick="toggleTheme()" aria-label="테마 변경">
     <span id="theme-icon">☀️</span>
   </button>
-
-  <!-- DB 탭 컨텐츠 -->
-  <div id="db-content" class="content">
 
   <!-- DB 탭 컨텐츠 -->
   <div id="db-content" class="content">
@@ -1343,7 +1393,7 @@ body {
         </select>
         <button class="btn btn-primary" onclick="mergeTypes()">병합</button>
       </div>
-      <p style="font-size: 13px; color: #666;">※ 병합하면 모든 케이스의 유형이 변경되며, 되돌릴 수 없습니다.</p>
+      <p style="font-size: 13px; color: var(--text-secondary);">※ 병합하면 모든 케이스의 유형이 변경되며, 되돌릴 수 없습니다.</p>
     </div>
 
     <!-- 2차 카테고리 승격 제안 -->
@@ -1366,11 +1416,11 @@ body {
 
     <!-- 필터 -->
     <div class="log-filters">
-      <div class="filter-chip active" data-filter="all" onclick="filterLogs('all')">전체</div>
-      <div class="filter-chip" data-filter="collection" onclick="filterLogs('collection')">수집</div>
-      <div class="filter-chip" data-filter="review" onclick="filterLogs('review')">검토</div>
-      <div class="filter-chip" data-filter="delete" onclick="filterLogs('delete')">삭제</div>
-      <div class="filter-chip" data-filter="manual" onclick="filterLogs('manual')">수동 실행</div>
+      <div class="filter-chip active" data-filter="all" onclick="filterLogs('all', event)">전체</div>
+      <div class="filter-chip" data-filter="collection" onclick="filterLogs('collection', event)">수집</div>
+      <div class="filter-chip" data-filter="review" onclick="filterLogs('review', event)">검토</div>
+      <div class="filter-chip" data-filter="delete" onclick="filterLogs('delete', event)">삭제</div>
+      <div class="filter-chip" data-filter="manual" onclick="filterLogs('manual', event)">수동 실행</div>
     </div>
 
     <!-- 로그 리스트 -->
@@ -1432,24 +1482,24 @@ body {
   </div>
 
   <!-- 하단 탭 네비게이션 -->
-  <nav class="bottom-nav">
-    <button class="tab-button" onclick="switchTab('db')">
-      <div class="tab-icon">📚</div>
+  <nav class="bottom-nav" role="navigation">
+    <button class="tab-button" onclick="switchTab('db', event)" aria-label="데이터베이스 탭" role="tab">
+      <div class="tab-icon" aria-hidden="true">📚</div>
       <div class="tab-label">DB</div>
     </button>
-    <button class="tab-button" onclick="switchTab('review')">
-      <div class="tab-icon">✅</div>
+    <button class="tab-button" onclick="switchTab('review', event)" aria-label="검토 탭" role="tab">
+      <div class="tab-icon" aria-hidden="true">✅</div>
       <div class="tab-label">검토</div>
     </button>
-    <button class="tab-button board active" onclick="switchTab('board')">
-      <div class="tab-icon">📊</div>
+    <button class="tab-button board active" onclick="switchTab('board', event)" aria-label="대시보드 탭" role="tab" aria-selected="true">
+      <div class="tab-icon" aria-hidden="true">📊</div>
     </button>
-    <button class="tab-button" onclick="switchTab('edit')">
-      <div class="tab-icon">⚙️</div>
+    <button class="tab-button" onclick="switchTab('edit', event)" aria-label="편집 탭" role="tab">
+      <div class="tab-icon" aria-hidden="true">⚙️</div>
       <div class="tab-label">편집</div>
     </button>
-    <button class="tab-button" onclick="switchTab('log')">
-      <div class="tab-icon">📋</div>
+    <button class="tab-button" onclick="switchTab('log', event)" aria-label="로그 탭" role="tab">
+      <div class="tab-icon" aria-hidden="true">📋</div>
       <div class="tab-label">로그</div>
     </button>
   </nav>
@@ -1459,20 +1509,20 @@ body {
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, collection, query, orderBy, limit, getDocs, where, doc, getDoc, updateDoc, deleteDoc, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    // Firebase 설정 (실제 값으로 교체하세요)
+    // Firebase 설정 - 여기에 새로 발급받은 키를 입력하세요
     const firebaseConfig = {
-      apiKey: "AIzaSyAmv5MlHGbzrZBw8lsMxt4vXYTwcetRcxI",
-      authDomain: "tpt-learning-49601.firebaseapp.com",
-      projectId: "tpt-learning-49601",
-      storageBucket: "tpt-learning-49601.firebasestorage.app",
-      messagingSenderId: "602423446232",
-      appId: "1:602423446232:web:48ebe5af774affda7225ad"
+      apiKey: "",  // 새로 발급받은 API 키를 여기에 입력
+      authDomain: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 전역 변수
+    // ==================== 전역 변수 ====================
     window.db = db;
     window.currentCaseId = null;
     window.currentReviewCase = null;
@@ -1481,11 +1531,106 @@ body {
     window.refreshCount = 0;
     window.currentLogFilter = 'all';
 
+    // 캐시 객체
+    const dataCache = {
+      cases: { data: null, timestamp: null, docs: [] },
+      logs: { data: null, timestamp: null, docs: [] },
+      maxAge: 5 * 60 * 1000 // 5분
+    };
+
+    // ==================== 유틸리티 함수 ====================
+    
+    // Toast 알림 표시
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // 에러 처리
+    function handleError(message, error) {
+      console.error(message, error);
+      showToast(message, 'error');
+    }
+
+    // 캐시된 케이스 가져오기
+    async function getCachedCases() {
+      const now = Date.now();
+      if (dataCache.cases.data && (now - dataCache.cases.timestamp) < dataCache.maxAge) {
+        return dataCache.cases.docs;
+      }
+      
+      try {
+        const casesRef = collection(db, 'cases');
+        const snapshot = await getDocs(casesRef);
+        
+        dataCache.cases = {
+          data: snapshot,
+          timestamp: now,
+          docs: snapshot.docs
+        };
+        
+        return snapshot.docs;
+      } catch (error) {
+        handleError('데이터를 불러오는데 실패했습니다', error);
+        return [];
+      }
+    }
+
+    // 캐시 무효화
+    function invalidateCache() {
+      dataCache.cases.data = null;
+      dataCache.logs.data = null;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      return `${year}.${month}.${day}`;
+    }
+
+    function formatTime(timestamp) {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diff = now - date;
+      
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      
+      if (minutes < 1) return '방금 전';
+      if (minutes < 60) return `${minutes}분 전`;
+      if (hours < 24) return `${hours}시간 전`;
+      if (days < 7) return `${days}일 전`;
+      
+      return date.toLocaleDateString('ko-KR');
+    }
+
+    function getActionLabel(action) {
+      const labels = {
+        'collection': '📥 데이터 수집',
+        'review': '✅ 검토 완료',
+        'delete': '🗑️ 삭제',
+        'manual': '🚀 수동 실행'
+      };
+      return labels[action] || action;
+    }
+
     // ==================== 탭 전환 ====================
-    window.switchTab = function(tabName) {
+    window.switchTab = function(tabName, event) {
       // 모든 탭 버튼 비활성화
       document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
       });
       
       // 모든 컨텐츠 숨기기
@@ -1494,7 +1639,21 @@ body {
       });
       
       // 선택된 탭 활성화
-      event.target.closest('.tab-button').classList.add('active');
+      if (event) {
+        const targetButton = event.target.closest('.tab-button');
+        if (targetButton) {
+          targetButton.classList.add('active');
+          targetButton.setAttribute('aria-selected', 'true');
+        }
+      } else {
+        // event가 없는 경우 (초기화 시)
+        const targetButton = document.querySelector(`[onclick*="switchTab('${tabName}',"]`);
+        if (targetButton) {
+          targetButton.classList.add('active');
+          targetButton.setAttribute('aria-selected', 'true');
+        }
+      }
+      
       document.getElementById(`${tabName}-content`).classList.add('active');
 
       // 탭별 로드 함수 실행
@@ -1516,10 +1675,12 @@ body {
 
     // ==================== DB 탭 ====================
     async function loadDBTab() {
-      await loadRecentCases();
-      await loadHotPlayers();
-      await loadTopics();
-      await loadTypes();
+      await Promise.all([
+        loadRecentCases(),
+        loadHotPlayers(),
+        loadTopics(),
+        loadTypes()
+      ]);
     }
 
     async function loadRecentCases() {
@@ -1545,7 +1706,7 @@ body {
           const data = doc.data();
           html += `
             <div class="case-card" onclick="openCaseModal('${doc.id}')">
-              <div class="case-title">${data.title}</div>
+              <div class="case-title">${data.title || '제목 없음'}</div>
               <div class="case-meta">
                 <span class="meta-badge actor">${data.actor?.label || '미분류'}</span>
                 <span class="meta-badge type">${data.teamType?.label || '미분류'}</span>
@@ -1558,7 +1719,7 @@ body {
         
         container.innerHTML = html;
       } catch (error) {
-        console.error('케이스 로드 오류:', error);
+        handleError('케이스를 불러오는데 실패했습니다', error);
         document.getElementById('recent-cases').innerHTML = `
           <div class="empty-state">
             <div class="empty-state-text">데이터를 불러올 수 없습니다</div>
@@ -1569,19 +1730,16 @@ body {
 
     async function loadHotPlayers() {
       try {
-        const casesRef = collection(db, 'cases');
+        const docs = await getCachedCases();
         const oneWeekAgo = new Date();
         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
         
-        const q = query(casesRef);
-        const snapshot = await getDocs(q);
-        
         // 행위 주체 빈도 계산 (최근 1주일)
         const actorCount = {};
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
-          const collectedDate = new Date(data.collectedAt);
-          if (collectedDate >= oneWeekAgo && data.actor?.label) {
+          const collectedDate = data.collectedAt ? new Date(data.collectedAt) : null;
+          if (collectedDate && collectedDate >= oneWeekAgo && data.actor?.label) {
             const actor = data.actor.label;
             actorCount[actor] = (actorCount[actor] || 0) + 1;
           }
@@ -1617,18 +1775,17 @@ body {
         
         container.innerHTML = html;
       } catch (error) {
-        console.error('핫 플레이어 로드 오류:', error);
+        handleError('핫 플레이어를 불러오는데 실패했습니다', error);
       }
     }
 
     async function loadTopics() {
       try {
-        const casesRef = collection(db, 'cases');
-        const snapshot = await getDocs(casesRef);
+        const docs = await getCachedCases();
         
         // 카테고리 빈도 계산
         const categoryCount = {};
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
           if (data.primaryCategory?.label) {
             const category = data.primaryCategory.label;
@@ -1664,18 +1821,17 @@ body {
         
         container.innerHTML = html;
       } catch (error) {
-        console.error('토픽 로드 오류:', error);
+        handleError('토픽을 불러오는데 실패했습니다', error);
       }
     }
 
     async function loadTypes() {
       try {
-        const casesRef = collection(db, 'cases');
-        const snapshot = await getDocs(casesRef);
+        const docs = await getCachedCases();
         
         // 유형 빈도 계산
         const typeCount = {};
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
           if (data.teamType?.label) {
             const type = data.teamType.label;
@@ -1702,7 +1858,7 @@ body {
         const maxCount = sorted[0][1];
         let html = '';
         sorted.forEach(([type, count]) => {
-          const size = Math.ceil((count / maxCount) * 5);
+          const size = Math.min(Math.ceil((count / maxCount) * 5), 5);
           html += `
             <div class="type-bubble size-${size}" onclick="filterByType('${type}')">${type}</div>
           `;
@@ -1710,7 +1866,7 @@ body {
         
         container.innerHTML = html;
       } catch (error) {
-        console.error('유형 로드 오류:', error);
+        handleError('유형을 불러오는데 실패했습니다', error);
       }
     }
 
@@ -1742,7 +1898,7 @@ body {
         window.refreshCount = 0;
         showReviewCard();
       } catch (error) {
-        console.error('검토 로드 오류:', error);
+        handleError('검토 데이터를 불러오는데 실패했습니다', error);
       }
     }
 
@@ -1775,7 +1931,7 @@ body {
       
       let optionsHtml = '';
       if (data.status === 'pending-actor' || data.status === 'pending-both') {
-        const options = [data.actor.label, ...(data.actor.options || [])];
+        const options = [data.actor?.label || '미분류', ...(data.actor?.options || [])];
         optionsHtml += '<div class="review-section">';
         optionsHtml += '<div class="review-label">행위 주체 옵션</div>';
         optionsHtml += '<div class="review-options">';
@@ -1786,7 +1942,7 @@ body {
       }
       
       if (data.status === 'pending-type' || data.status === 'pending-both') {
-        const options = [data.teamType.label, ...(data.teamType.options || [])];
+        const options = [data.teamType?.label || '미분류', ...(data.teamType?.options || [])];
         optionsHtml += '<div class="review-section">';
         optionsHtml += '<div class="review-label">팀플 유형 옵션</div>';
         optionsHtml += '<div class="review-options">';
@@ -1800,20 +1956,20 @@ body {
         <div class="review-card" id="current-review-card">
           <div class="review-card-header">
             <div class="review-type-badge ${reviewTypeClass}">${reviewType}</div>
-            <div class="review-card-title">${data.title}</div>
+            <div class="review-card-title">${data.title || '제목 없음'}</div>
           </div>
           <div class="review-card-body">
             <div class="review-section">
               <div class="review-label">발췌</div>
-              <div class="review-excerpt">${data.excerpt || data.content?.substring(0, 150) + '...'}</div>
+              <div class="review-excerpt">${data.excerpt || data.content?.substring(0, 150) + '...' || '내용 없음'}</div>
             </div>
             
             ${optionsHtml}
             
             <div class="review-section">
               <div class="review-label">분류 근거</div>
-              <div class="review-content">${data.classificationReason?.actorReason || ''}</div>
-              <div class="review-content">${data.classificationReason?.typeReason || ''}</div>
+              <div class="review-content">${data.classificationReason?.actorReason || '-'}</div>
+              <div class="review-content">${data.classificationReason?.typeReason || '-'}</div>
             </div>
           </div>
           <div class="review-card-footer">
@@ -1835,6 +1991,8 @@ body {
       const card = document.getElementById('current-review-card');
       card.classList.add('slide-out-down');
       
+      showToast(`${option}안이 선택되었습니다`, 'success');
+      
       setTimeout(() => {
         window.reviewIndex++;
         window.refreshCount = 0;
@@ -1844,33 +2002,34 @@ body {
 
     window.refreshOptions = function() {
       if (window.refreshCount >= 3) {
-        // 직접 수정 모드로 전환
-        alert('직접 수정 기능 구현 예정');
+        showToast('직접 수정 기능은 준비 중입니다', 'info');
         return;
       }
       
       window.refreshCount++;
+      showToast('새 옵션을 생성하고 있습니다...', 'info');
       // TODO: AI로 새 옵션 생성
       showReviewCard();
     };
 
     // ==================== 보드 탭 ====================
     async function loadBoardTab() {
-      await loadStats();
-      await loadRecentLogs();
+      await Promise.all([
+        loadStats(),
+        loadRecentLogs()
+      ]);
     }
 
     async function loadStats() {
       try {
-        const casesRef = collection(db, 'cases');
-        const snapshot = await getDocs(casesRef);
+        const docs = await getCachedCases();
         
         let total = 0;
         let pending = 0;
         let approved = 0;
         let rejected = 0;
         
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
           total++;
           
@@ -1888,7 +2047,7 @@ body {
         document.getElementById('stat-approved').textContent = approved;
         document.getElementById('stat-rejected').textContent = rejected;
       } catch (error) {
-        console.error('통계 로드 오류:', error);
+        handleError('통계를 불러오는데 실패했습니다', error);
       }
     }
 
@@ -1926,7 +2085,7 @@ body {
         
         container.innerHTML = html;
       } catch (error) {
-        console.error('로그 로드 오류:', error);
+        handleError('로그를 불러오는데 실패했습니다', error);
       }
     }
 
@@ -1943,24 +2102,27 @@ body {
       setTimeout(() => {
         btn.disabled = false;
         status.textContent = '✅ 수집 완료! (시뮬레이션)';
+        showToast('데이터 수집이 완료되었습니다', 'success');
+        invalidateCache();
         loadBoardTab();
       }, 3000);
     };
 
     // ==================== 편집 탭 ====================
     async function loadEditTab() {
-      await loadCategories();
-      await loadTypesForMerge();
+      await Promise.all([
+        loadCategories(),
+        loadTypesForMerge()
+      ]);
     }
 
     async function loadCategories() {
       try {
-        const casesRef = collection(db, 'cases');
-        const snapshot = await getDocs(casesRef);
+        const docs = await getCachedCases();
         
         // 카테고리별 키워드 수집
         const categories = {};
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
           if (data.primaryCategory?.label) {
             const label = data.primaryCategory.label;
@@ -1994,17 +2156,16 @@ body {
         
         container.innerHTML = html || '<div class="empty-state"><div class="empty-state-text">카테고리가 없습니다</div></div>';
       } catch (error) {
-        console.error('카테고리 로드 오류:', error);
+        handleError('카테고리를 불러오는데 실패했습니다', error);
       }
     }
 
     async function loadTypesForMerge() {
       try {
-        const casesRef = collection(db, 'cases');
-        const snapshot = await getDocs(casesRef);
+        const docs = await getCachedCases();
         
         const types = new Set();
-        snapshot.forEach(doc => {
+        docs.forEach(doc => {
           const data = doc.data();
           if (data.teamType?.label) {
             types.add(data.teamType.label);
@@ -2022,7 +2183,7 @@ body {
         mergeFrom.innerHTML = options;
         mergeTo.innerHTML = options;
       } catch (error) {
-        console.error('유형 로드 오류:', error);
+        handleError('유형 목록을 불러오는데 실패했습니다', error);
       }
     }
 
@@ -2031,21 +2192,22 @@ body {
       const keywords = document.getElementById('new-category-keywords').value.trim();
       
       if (!name) {
-        alert('카테고리 이름을 입력하세요');
+        showToast('카테고리 이름을 입력하세요', 'error');
         return;
       }
       
       // TODO: Firestore에 카테고리 추가
-      alert('카테고리 추가 기능 구현 예정');
+      showToast('카테고리 추가 기능은 준비 중입니다', 'info');
     };
 
     window.editCategory = function(name) {
-      alert(`카테고리 편집: ${name} (구현 예정)`);
+      showToast(`카테고리 편집: ${name} (준비 중)`, 'info');
     };
 
     window.deleteCategory = function(name) {
       if (confirm(`"${name}" 카테고리를 삭제하시겠습니까?`)) {
-        alert('카테고리 삭제 기능 구현 예정');
+        // TODO: 실제 삭제 로직
+        showToast('카테고리 삭제 기능은 준비 중입니다', 'info');
       }
     };
 
@@ -2054,17 +2216,18 @@ body {
       const to = document.getElementById('merge-to').value;
       
       if (!from || !to) {
-        alert('병합할 유형과 대상 유형을 모두 선택하세요');
+        showToast('병합할 유형과 대상 유형을 모두 선택하세요', 'error');
         return;
       }
       
       if (from === to) {
-        alert('같은 유형은 병합할 수 없습니다');
+        showToast('같은 유형은 병합할 수 없습니다', 'error');
         return;
       }
       
       if (confirm(`"${from}"을(를) "${to}"(으)로 병합하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
-        alert('유형 병합 기능 구현 예정');
+        // TODO: 실제 병합 로직
+        showToast('유형 병합 기능은 준비 중입니다', 'info');
       }
     };
 
@@ -2112,18 +2275,20 @@ body {
         
         container.innerHTML = html || '<div class="empty-state"><div class="empty-state-text">필터 조건에 맞는 로그가 없습니다</div></div>';
       } catch (error) {
-        console.error('로그 로드 오류:', error);
+        handleError('로그를 불러오는데 실패했습니다', error);
       }
     }
 
-    window.filterLogs = function(filter) {
+    window.filterLogs = function(filter, event) {
       window.currentLogFilter = filter;
       
       // 필터 칩 활성화
       document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.classList.remove('active');
       });
-      event.target.classList.add('active');
+      if (event) {
+        event.target.classList.add('active');
+      }
       
       loadAllLogs();
     };
@@ -2137,14 +2302,14 @@ body {
         const docSnap = await getDoc(docRef);
         
         if (!docSnap.exists()) {
-          alert('케이스를 찾을 수 없습니다');
+          showToast('케이스를 찾을 수 없습니다', 'error');
           return;
         }
         
         const data = docSnap.data();
         
-        document.getElementById('modal-title').textContent = data.title;
-        document.getElementById('modal-excerpt').textContent = data.excerpt || data.content?.substring(0, 200);
+        document.getElementById('modal-title').textContent = data.title || '제목 없음';
+        document.getElementById('modal-excerpt').textContent = data.excerpt || data.content?.substring(0, 200) || '내용 없음';
         document.getElementById('modal-actor').innerHTML = `
           <strong>${data.actor?.label || '미분류'}</strong> (신뢰도: ${data.actor?.confidence || 0}%)
         `;
@@ -2159,8 +2324,7 @@ body {
         
         document.getElementById('case-modal').classList.add('active');
       } catch (error) {
-        console.error('케이스 로드 오류:', error);
-        alert('케이스를 불러올 수 없습니다');
+        handleError('케이스를 불러오는데 실패했습니다', error);
       }
     };
 
@@ -2181,12 +2345,12 @@ body {
           timestamp: new Date().toISOString()
         });
         
+        invalidateCache();
         closeModal();
         loadDBTab();
-        alert('삭제되었습니다');
+        showToast('케이스가 삭제되었습니다', 'success');
       } catch (error) {
-        console.error('삭제 오류:', error);
-        alert('삭제에 실패했습니다');
+        handleError('삭제에 실패했습니다', error);
       }
     };
 
@@ -2197,68 +2361,31 @@ body {
     };
 
     window.showHistory = function() {
-      alert('승인 기록 기능 구현 예정');
+      showToast('승인 기록 기능은 준비 중입니다', 'info');
     };
 
     // ==================== 필터 함수 ====================
     window.filterByActor = function(actor) {
-      alert(`"${actor}" 필터링 기능 구현 예정`);
+      showToast(`"${actor}" 필터링 기능은 준비 중입니다`, 'info');
     };
 
     window.filterByCategory = function(category) {
-      alert(`"${category}" 카테고리 필터링 기능 구현 예정`);
+      showToast(`"${category}" 카테고리 필터링 기능은 준비 중입니다`, 'info');
     };
 
     window.filterByType = function(type) {
-      alert(`"${type}" 유형 필터링 기능 구현 예정`);
+      showToast(`"${type}" 유형 필터링 기능은 준비 중입니다`, 'info');
     };
 
     window.showAllCases = function() {
-      alert('전체 케이스 목록 (페이징) 기능 구현 예정');
+      showToast('전체 케이스 목록 기능은 준비 중입니다', 'info');
     };
 
     window.showHotPlayersDetail = function() {
-      alert('TOP 20 핫 플레이어 기능 구현 예정');
+      showToast('TOP 20 핫 플레이어 기능은 준비 중입니다', 'info');
     };
 
-    // ==================== 유틸리티 ====================
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const year = dateStr.substring(0, 4);
-      const month = dateStr.substring(4, 6);
-      const day = dateStr.substring(6, 8);
-      return `${year}.${month}.${day}`;
-    }
-
-    function formatTime(timestamp) {
-      if (!timestamp) return '';
-      const date = new Date(timestamp);
-      const now = new Date();
-      const diff = now - date;
-      
-      const minutes = Math.floor(diff / 60000);
-      const hours = Math.floor(diff / 3600000);
-      const days = Math.floor(diff / 86400000);
-      
-      if (minutes < 1) return '방금 전';
-      if (minutes < 60) return `${minutes}분 전`;
-      if (hours < 24) return `${hours}시간 전`;
-      if (days < 7) return `${days}일 전`;
-      
-      return date.toLocaleDateString('ko-KR');
-    }
-
-    function getActionLabel(action) {
-      const labels = {
-        'collection': '📥 데이터 수집',
-        'review': '✅ 검토 완료',
-        'delete': '🗑️ 삭제',
-        'manual': '🚀 수동 실행'
-      };
-      return labels[action] || action;
-    }
-
-// ==================== 테마 토글 ====================
+    // ==================== 테마 토글 ====================
     window.toggleTheme = function() {
       const body = document.body;
       const icon = document.getElementById('theme-icon');
@@ -2288,29 +2415,47 @@ body {
 
     // ==================== 초기화 ====================
     window.addEventListener('DOMContentLoaded', () => {
-        // 테마 로드
-  loadTheme();
+      // 테마 로드
+      loadTheme();
 
       // 마지막 탭 복원 또는 기본 탭 (보드)
       const lastTab = localStorage.getItem('lastTab') || 'board';
       
-      // UI 초기화
+      // 모든 탭 버튼 비활성화
       document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
       });
+      
+      // 모든 컨텐츠 숨기기
       document.querySelectorAll('.content').forEach(content => {
         content.classList.remove('active');
       });
       
-      // 기본 탭 활성화
-      document.querySelector(`.tab-button.${lastTab === 'board' ? 'board' : ''}`).classList.add('active');
-      if (lastTab !== 'board') {
-        document.querySelector(`[onclick="switchTab('${lastTab}')"]`).classList.add('active');
+      // 저장된 탭 활성화
+      const targetButton = lastTab === 'board' 
+        ? document.querySelector('.tab-button.board')
+        : document.querySelector(`[onclick*="switchTab('${lastTab}',"]`);
+      
+      if (targetButton) {
+        targetButton.classList.add('active');
+        targetButton.setAttribute('aria-selected', 'true');
       }
+      
       document.getElementById(`${lastTab}-content`).classList.add('active');
       
-      // 보드 탭 로드
-      loadBoardTab();
+      // 해당 탭 로드
+      if (lastTab === 'board') {
+        loadBoardTab();
+      } else if (lastTab === 'db') {
+        loadDBTab();
+      } else if (lastTab === 'review') {
+        loadReviewTab();
+      } else if (lastTab === 'edit') {
+        loadEditTab();
+      } else if (lastTab === 'log') {
+        loadLogTab();
+      }
     });
 
     // 모달 외부 클릭 시 닫기
