@@ -2589,6 +2589,21 @@ const firebaseConfig = {
       
       const startTime = window.reviewStartTime || Date.now();
       const timeSpent = (Date.now() - startTime) / 1000;
+
+    try {
+      await addDoc(collection(db, 'logs'), {
+        action: 'review',
+        caseId: current.id,
+        caseTitle: current.data.title || '제목 없음',
+        optionSelected: option,
+        status: current.data.status,
+        timestamp: new Date().toISOString(),
+        details: `${option}안 선택 (${current.data.status})`
+      });
+      console.log('✅ 검토 로그 저장 완료');
+    } catch (error) {
+      console.error('❌ 검토 로그 저장 실패:', error);
+    }
       
       // AI 학습 데이터 저장
       if (window.saveAITrainingData) {
